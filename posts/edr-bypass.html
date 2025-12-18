@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Title | Security Portfolio</title>
+    <meta name="description" content="Post description for SEO">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9f9f9;
+            --text-primary: #242424;
+            --text-secondary: #6b6b6b;
+            --accent: #1a8917;
+            --border: #e6e6e6;
+            --hover: #f4f4f4;
+            --code-bg: #f5f5f5;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #3dd68c;
+            --border: #2a2a2a;
+            --hover: #252525;
+            --code-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] nav {
+            background: rgba(10, 10, 10, 0.98);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover);
+            transform: scale(1.05);
+        }
+
+        article {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .post-header {
+            margin-bottom: 3rem;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .post-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .post-tags {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .post-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+
+        .post-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .post-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-content ul, .post-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+
+        .post-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .post-content a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .post-content a:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        .post-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .post-content code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        .post-content pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .post-content pre code {
+            background: none;
+            padding: 0;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .post-content hr {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 3rem 0;
+        }
+
+        .info-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 2rem 0;
+        }
+
+        .info-box h4 {
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .author-section {
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .author-card {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .author-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .author-info h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .author-info p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .author-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .author-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .related-posts {
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .related-posts h3 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .related-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .related-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .post-description {
+                font-size: 1.1rem;
+            }
+
+            .post-content {
+                font-size: 1rem;
+            }
+
+            .post-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .author-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-right {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">Security Portfolio</a>
+            <div class="nav-right">
+                <a href="index.html" class="back-link">← Back to Portfolio</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <article>
+        <header class="post-header">
+            <div class="post-meta">
+                <span>📅 December 18, 2024</span>
+                <span>⏱️ 10 min read</span>
+                <span>✍️ Author Name</span>
+            </div>
+            <h1>Breaking Down Advanced Privilege Escalation Techniques in Windows Environments</h1>
+            <p class="post-description">
+                A comprehensive guide to understanding and exploiting privilege escalation vulnerabilities in Windows Active Directory environments, including practical examples and mitigation strategies.
+            </p>
+            <div class="post-tags">
+                <span class="tag">Privilege Escalation</span>
+                <span class="tag">Windows</span>
+                <span class="tag">Active Directory</span>
+                <span class="tag">Red Teaming</span>
+            </div>
+        </header>
+
+        <div class="post-content">
+            <h2>Introduction</h2>
+            <p>
+                Privilege escalation is a critical phase in penetration testing and red team operations. After gaining initial access to a Windows environment, attackers typically need to elevate their privileges to achieve their objectives. This post explores advanced techniques used by security professionals to identify and exploit privilege escalation vectors.
+            </p>
+
+            <p>
+                Understanding these techniques is crucial not only for offensive security practitioners but also for defenders who need to recognize and mitigate these attack patterns in their environments.
+            </p>
+
+            <div class="info-box">
+                <h4>⚠️ Ethical Disclaimer</h4>
+                <p>The techniques described in this post are for educational purposes and authorized security testing only. Unauthorized access to computer systems is illegal. Always obtain proper authorization before conducting security assessments.</p>
+            </div>
+
+            <h2>Common Privilege Escalation Vectors</h2>
+            <p>
+                Before diving into specific techniques, it's important to understand the common vectors that attackers exploit for privilege escalation:
+            </p>
+
+            <ul>
+                <li><strong>Service Misconfigurations</strong> - Weak permissions on services that can be modified</li>
+                <li><strong>Unquoted Service Paths</strong> - Services with paths containing spaces without quotes</li>
+                <li><strong>Token Impersonation</strong> - Leveraging existing privileged tokens</li>
+                <li><strong>Kernel Exploits</strong> - Exploiting vulnerabilities in the Windows kernel</li>
+                <li><strong>DLL Hijacking</strong> - Replacing legitimate DLLs with malicious ones</li>
+            </ul>
+
+            <h3>Examining Service Permissions</h3>
+            <p>
+                One of the first things to check when looking for privilege escalation opportunities is service permissions. Windows services running with elevated privileges can be goldmines if they're misconfigured.
+            </p>
+
+            <pre><code># PowerShell command to enumerate services
+Get-WmiObject win32_service | Select-Object Name, State, PathName | Where-Object {$_.State -eq 'Running'}
+
+# Check specific service permissions
+sc.exe qc ServiceName</code></pre>
+
+            <h3>Token Impersonation Attacks</h3>
+            <p>
+                Token impersonation is a powerful technique where an attacker leverages existing access tokens from privileged accounts. The classic example is using tools like Incognito or built-in Windows capabilities to impersonate SYSTEM or Administrator tokens.
+            </p>
+
+            <blockquote>
+                "Token impersonation attacks are particularly dangerous because they don't require password cracking or exploiting vulnerabilities. They simply leverage existing credentials that are already in memory."
+            </blockquote>
+
+            <h2>Advanced Enumeration Techniques</h2>
+            <p>
+                Thorough enumeration is the foundation of successful privilege escalation. Here are some advanced techniques for discovering escalation vectors:
+            </p>
+
+            <ol>
+                <li>Automated enumeration with tools like WinPEAS or PowerUp</li>
+                <li>Manual registry inspection for stored credentials</li>
+                <li>Analysis of scheduled tasks and their permissions</li>
+                <li>Review of Group Policy Objects (GPOs) for misconfigurations</li>
+                <li>Examination of AlwaysInstallElevated registry keys</li>
+            </ol>
+
+            <h3>Using PowerUp for Automated Discovery</h3>
+            <pre><code># Load PowerUp
+. .\PowerUp.ps1
+
+# Run all privilege escalation checks
+Invoke-AllChecks
+
+# Check for specific vulnerabilities
+Get-ServiceUnquoted
+Get-ModifiableServiceFile
+Get-ModifiableService</code></pre>
+
+            <hr>
+
+            <h2>Mitigation Strategies</h2>
+            <p>
+                Understanding attack techniques is only half the battle. Here are key mitigation strategies that organizations should implement:
+            </p>
+
+            <ul>
+                <li>Apply the principle of least privilege across all accounts and services</li>
+                <li>Regularly audit service configurations and permissions</li>
+                <li>Keep systems patched and up-to-date</li>
+                <li>Implement proper monitoring and logging for privilege escalation indicators</li>
+                <li>Use endpoint detection and response (EDR) solutions</li>
+                <li>Conduct regular penetration tests and security assessments</li>
+            </ul>
+
+            <h2>Conclusion</h2>
+            <p>
+                Privilege escalation remains a critical component of offensive security operations. By understanding these techniques, security professionals can better defend their environments and identify weaknesses before malicious actors do.
+            </p>
+
+            <p>
+                The key takeaway is that defense requires constant vigilance, proper configuration management, and regular security assessments. No single mitigation will prevent all privilege escalation attacks, but a defense-in-depth approach significantly raises the bar for attackers.
+            </p>
+
+            <p>
+                In future posts, I'll dive deeper into specific techniques such as Kerberoasting, LLMNR poisoning, and advanced Active Directory exploitation methods. Stay tuned!
+            </p>
+        </div>
+
+        <div class="author-section">
+            <div class="author-card">
+                <div class="author-avatar">SE</div>
+                <div class="author-info">
+                    <h3>Security Engineer</h3>
+                    <p>Offensive security professional specializing in penetration testing and red team operations. Passionate about sharing knowledge and helping organizations improve their security posture.</p>
+                    <div class="author-links">
+                        <a href="#">Twitter</a>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">GitHub</a>
+                        <a href="#">Website</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="related-posts">
+            <h3>Related Posts</h3>
+            <div class="related-grid">
+                <a href="#" class="related-card">
+                    <h4>Exploiting Active Directory Trust Relationships</h4>
+                    <p>Learn how attackers leverage trust relationships between domains to move laterally...</p>
+                </a>
+                <a href="#" class="related-card">
+                    <h4>Modern EDR Bypass Techniques</h4>
+                    <p>A deep dive into techniques for evading endpoint detection and response solutions...</p>
+                </a>
+                <a href="#" class="related-card">
+                    <h4>Building Your Own Red Team Infrastructure</h4>
+                    <p>Step-by-step guide to setting up a professional red team infrastructure...</p>
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2024 Security Portfolio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offensive Security Engineer | Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9f9f9;
+            --text-primary: #242424;
+            --text-secondary: #6b6b6b;
+            --accent: #1a8917;
+            --border: #e6e6e6;
+            --hover: #f4f4f4;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #3dd68c;
+            --border: #2a2a2a;
+            --hover: #252525;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+        }
+		
+		[data-theme="dark"] nav {
+            background: rgba(10, 10, 10, 0.98);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover);
+            transform: scale(1.05);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        .hero {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .content-width {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        section {
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4rem auto;
+            max-width: 1200px;
+        }
+
+        .about-content {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .about-content p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem auto;
+            max-width: 800px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .skills-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .skill-category {
+            margin-bottom: 3rem;
+        }
+
+        .skill-category h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .skill-item {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 50px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .skill-item:hover {
+            background: var(--bg-primary);
+            border-color: var(--border);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .project-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .project-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .cert-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .cert-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .cert-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .cert-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .blog-post-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .blog-post-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .blog-post-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .blog-post-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .blog-post-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .read-more {
+            color: var(--accent);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .contact-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 3rem;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: var(--bg-primary);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button {
+            background: var(--text-primary);
+            color: white;
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: var(--text-secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .social-link:hover {
+            color: var(--text-primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            nav .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-right {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+
+            .theme-toggle {
+                margin: 0 auto;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="#home" class="logo">Security Portfolio</a>
+            <div class="nav-right">
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#skills">Expertise</a></li>
+                    <li><a href="#projects">Work</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#certifications">Certifications</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <h1>Offensive Security Engineer</h1>
+        <p>Specializing in penetration testing, red team operations, and security research to help organizations identify and remediate critical vulnerabilities before adversaries do.</p>
+        <div class="hero-meta">
+            <span>📍 Remote / Global</span>
+            <span>🎯 Available for Consulting</span>
+            <span>🔒 OSCP | OSEP | GPEN</span>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="blog">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Latest Posts</h2>
+                <p class="section-subtitle">Technical writeups, research, and security insights</p>
+            </div>
+            <div class="blog-grid">
+                <a href="posts/privilege-escalation.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Dec 18, 2024</span>
+                        <span>⏱️ 10 min read</span>
+                    </div>
+                    <h3>Breaking Down Advanced Privilege Escalation Techniques in Windows</h3>
+                    <p>A comprehensive guide to understanding and exploiting privilege escalation vulnerabilities in Windows Active Directory environments, including practical examples and mitigation strategies.</p>
+                    <div class="project-tags">
+                        <span class="tag">Privilege Escalation</span>
+                        <span class="tag">Windows</span>
+                        <span class="tag">Active Directory</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+
+                <a href="posts/edr-bypass.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Dec 10, 2024</span>
+                        <span>⏱️ 15 min read</span>
+                    </div>
+                    <h3>Modern EDR Bypass Techniques</h3>
+                    <p>A deep dive into techniques for evading endpoint detection and response solutions, including process injection, memory manipulation, and obfuscation methods used in real-world engagements.</p>
+                    <div class="project-tags">
+                        <span class="tag">EDR Bypass</span>
+                        <span class="tag">Red Teaming</span>
+                        <span class="tag">Evasion</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+
+                <a href="posts/ad-exploitation.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Nov 28, 2024</span>
+                        <span>⏱️ 12 min read</span>
+                    </div>
+                    <h3>Exploiting Active Directory Trust Relationships</h3>
+                    <p>Learn how attackers leverage trust relationships between domains to move laterally and escalate privileges across forest boundaries in complex enterprise environments.</p>
+                    <div class="project-tags">
+                        <span class="tag">Active Directory</span>
+                        <span class="tag">Lateral Movement</span>
+                        <span class="tag">Domain Trusts</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+
+                <a href="posts/cloud-security.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Nov 15, 2024</span>
+                        <span>⏱️ 8 min read</span>
+                    </div>
+                    <h3>AWS Pentesting: From S3 Buckets to IAM Privilege Escalation</h3>
+                    <p>Practical techniques for identifying and exploiting common AWS misconfigurations, including IAM policy abuse, S3 bucket enumeration, and Lambda function vulnerabilities.</p>
+                    <div class="project-tags">
+                        <span class="tag">Cloud Security</span>
+                        <span class="tag">AWS</span>
+                        <span class="tag">Pentesting</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+
+                <a href="posts/red-team-infra.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Oct 30, 2024</span>
+                        <span>⏱️ 20 min read</span>
+                    </div>
+                    <h3>Building Your Own Red Team Infrastructure</h3>
+                    <p>Step-by-step guide to setting up a professional red team infrastructure including command and control servers, redirectors, payload hosting, and operational security considerations.</p>
+                    <div class="project-tags">
+                        <span class="tag">Red Team</span>
+                        <span class="tag">Infrastructure</span>
+                        <span class="tag">C2</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+
+                <a href="posts/web-app-hacking.html" class="blog-post-card">
+                    <div class="blog-post-meta">
+                        <span>📅 Oct 12, 2024</span>
+                        <span>⏱️ 14 min read</span>
+                    </div>
+                    <h3>Advanced Web Application Exploitation Techniques</h3>
+                    <p>Exploring sophisticated web application vulnerabilities beyond OWASP Top 10, including business logic flaws, race conditions, and complex authentication bypass scenarios.</p>
+                    <div class="project-tags">
+                        <span class="tag">Web Security</span>
+                        <span class="tag">Bug Bounty</span>
+                        <span class="tag">OWASP</span>
+                    </div>
+                    <p class="read-more">Read more →</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">Building security through adversarial thinking</p>
+            </div>
+            <div class="about-content">
+                <p>
+                    I'm an offensive security professional with over 5 years of experience helping organizations understand their security posture through real-world attack simulations. My work spans across network penetration testing, web application security, cloud infrastructure assessments, and full-scope red team engagements.
+                </p>
+                <p>
+                    I believe that the best way to defend is to understand how attackers think and operate. My approach combines deep technical knowledge with creative problem-solving to uncover vulnerabilities that automated tools might miss. I've worked with clients ranging from startups to Fortune 500 companies across finance, healthcare, and technology sectors.
+                </p>
+                <p>
+                    Beyond client work, I'm passionate about contributing to the security community through research, tool development, and knowledge sharing. I regularly participate in bug bounty programs, contribute to open-source security projects, and stay current with the latest attack techniques and defensive strategies.
+                </p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">150+</div>
+                    <div class="stat-label">Security Assessments</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Vulnerabilities Found</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">25+</div>
+                    <div class="stat-label">CVEs Discovered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Client Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="skills">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Areas of Expertise</h2>
+                <p class="section-subtitle">Technical skills and methodologies I employ in security assessments</p>
+            </div>
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3>Penetration Testing</h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Network Security Testing</span>
+                        <span class="skill-item">Web Application Security</span>
+                        <span class="skill-item">Mobile Application Testing</span>
+                        <span class="skill-item">API Security</span>
+                        <span class="skill-item">Cloud Infrastructure (AWS/Azure/GCP)</span>
+                        <span class="skill-item">Wireless Security</span>
+                        <span class="skill-item">Physical Security</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Red Team Operations</h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Initial Access</span>
+                        <span class="skill-item">Command & Control</span>
+                        <span class="skill-item">Lateral Movement</span>
+                        <span class="skill-item">Privilege Escalation</span>
+                        <span class="skill-item">Persistence Mechanisms</span>
+                        <span class="skill-item">Data Exfiltration</span>
+                        <span class="skill-item">Adversary Simulation</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Technical Skills</h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Python</span>
+                        <span class="skill-item">PowerShell</span>
+                        <span class="skill-item">Bash/Shell Scripting</span>
+                        <span class="skill-item">C/C++</span>
+                        <span class="skill-item">Go</span>
+                        <span class="skill-item">JavaScript</span>
+                        <span class="skill-item">SQL</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Tools & Frameworks</h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Burp Suite Pro</span>
+                        <span class="skill-item">Metasploit Framework</span>
+                        <span class="skill-item">Cobalt Strike</span>
+                        <span class="skill-item">BloodHound</span>
+                        <span class="skill-item">Empire/Covenant</span>
+                        <span class="skill-item">Nmap</span>
+                        <span class="skill-item">Wireshark</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Work</h2>
+                <p class="section-subtitle">Selected engagements and security research projects</p>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>Enterprise Network Assessment</h3>
+                    <p>Conducted comprehensive internal and external penetration testing for a Fortune 500 financial services company. Identified critical vulnerabilities in their infrastructure, achieved domain compromise, and provided strategic remediation guidance.</p>
+                    <div class="project-tags">
+                        <span class="tag">Network Pentesting</span>
+                        <span class="tag">Active Directory</span>
+                        <span class="tag">Privilege Escalation</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Red Team Operation</h3>
+                    <p>Led a 6-week adversary simulation for a healthcare organization. Successfully bypassed EDR solutions, maintained persistence, and demonstrated the impact of a sophisticated threat actor through lateral movement and data exfiltration scenarios.</p>
+                    <div class="project-tags">
+                        <span class="tag">Red Teaming</span>
+                        <span class="tag">EDR Bypass</span>
+                        <span class="tag">Social Engineering</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>SaaS Platform Security Review</h3>
+                    <p>Performed in-depth security assessment of a multi-tenant SaaS application. Discovered authentication bypass, broken access controls, and business logic flaws that could lead to cross-tenant data access.</p>
+                    <div class="project-tags">
+                        <span class="tag">Web Security</span>
+                        <span class="tag">API Testing</span>
+                        <span class="tag">OWASP Top 10</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Cloud Security Assessment</h3>
+                    <p>Evaluated AWS environment security for a technology startup. Identified misconfigured IAM policies, exposed S3 buckets, and privilege escalation paths. Delivered comprehensive cloud security architecture recommendations.</p>
+                    <div class="project-tags">
+                        <span class="tag">AWS</span>
+                        <span class="tag">Cloud Security</span>
+                        <span class="tag">IAM</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Custom Exploit Development</h3>
+                    <p>Researched and developed proof-of-concept exploits for zero-day vulnerabilities in enterprise software. Responsibly disclosed findings to affected vendors and received CVE assignments.</p>
+                    <div class="project-tags">
+                        <span class="tag">0-day Research</span>
+                        <span class="tag">Exploit Dev</span>
+                        <span class="tag">CVE</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Security Automation Tools</h3>
+                    <p>Developed open-source security tools for reconnaissance automation, vulnerability validation, and post-exploitation activities. Tools have been adopted by security professionals worldwide with 2,000+ GitHub stars.</p>
+                    <div class="project-tags">
+                        <span class="tag">Tool Development</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">Open Source</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="certifications">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Certifications</h2>
+                <p class="section-subtitle">Professional certifications and credentials</p>
+            </div>
+            <div class="cert-list">
+                <div class="cert-item">
+                    <div class="cert-icon">O</div>
+                    <div class="cert-info">
+                        <h4>OSCP</h4>
+                        <p>Offensive Security Certified Professional</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">O</div>
+                    <div class="cert-info">
+                        <h4>OSEP</h4>
+                        <p>Offensive Security Experienced Penetration Tester</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">G</div>
+                    <div class="cert-info">
+                        <h4>GPEN</h4>
+                        <p>GIAC Penetration Tester</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">G</div>
+                    <div class="cert-info">
+                        <h4>GXPN</h4>
+                        <p>GIAC Exploit Researcher and Advanced Penetration Tester</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">C</div>
+                    <div class="cert-info">
+                        <h4>CRTO</h4>
+                        <p>Certified Red Team Operator</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">E</div>
+                    <div class="cert-info">
+                        <h4>eWPTX</h4>
+                        <p>eLearnSecurity Web Application Penetration Tester eXtreme</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get in Touch</h2>
+                <p class="section-subtitle">Interested in working together? Let's discuss your security needs</p>
+            </div>
+            <div class="contact-section">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" placeholder="What would you like to discuss?" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Tell me about your project or inquiry..." required></textarea>
+                    </div>
+                    <button type="submit">Send Message</button>
+                </form>
+                <div class="social-links">
+                    <a href="#" class="social-link">LinkedIn</a>
+                    <a href="#" class="social-link">GitHub</a>
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">Blog</a>
+                    <a href="#" class="social-link">Email</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2024 Security Portfolio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Form submission (placeholder)
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! This is a demo form. In production, this would send your message.');
+        });
+    </script>
+</body>
+</html>
