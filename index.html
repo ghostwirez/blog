@@ -1,984 +1,1145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offensive Security Engineer | Portfolio</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9f9f9;
-            --text-primary: #242424;
-            --text-secondary: #6b6b6b;
-            --accent: #1a8917;
-            --border: #e6e6e6;
-            --hover: #f4f4f4;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent: #3dd68c;
-            --border: #2a2a2a;
-            --hover: #252525;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        nav {
-            position: sticky;
-            top: 0;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.98);
-        }
-		
-		[data-theme="dark"] nav {
-            background: rgba(10, 10, 10, 0.98);
-        }
-
-        nav .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .theme-toggle {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .theme-toggle:hover {
-            background: var(--hover);
-            transform: scale(1.05);
-        }
-
-        nav ul {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s;
-            font-size: 0.95rem;
-        }
-
-        nav a:hover {
-            color: var(--text-primary);
-        }
-
-        .hero {
-            max-width: 680px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        .hero-meta {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .content-width {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        section {
-            padding: 4rem 2rem;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        .section-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 4rem auto;
-            max-width: 1200px;
-        }
-
-        .about-content {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .about-content p {
-            font-size: 1.125rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin: 3rem auto;
-            max-width: 800px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 2rem;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .skills-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .skill-category {
-            margin-bottom: 3rem;
-        }
-
-        .skill-category h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .skill-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .skill-item {
-            padding: 0.75rem 1.5rem;
-            background: var(--bg-secondary);
-            border-radius: 50px;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .skill-item:hover {
-            background: var(--bg-primary);
-            border-color: var(--border);
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .project-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .project-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .project-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .project-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .tag {
-            padding: 0.4rem 0.8rem;
-            background: var(--bg-secondary);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .cert-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .cert-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.5rem;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .cert-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--accent);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .cert-info h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .cert-info p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .blog-post-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: var(--text-primary);
-            display: block;
-        }
-
-        .blog-post-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .blog-post-meta {
-            display: flex;
-            gap: 1rem;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .blog-post-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .blog-post-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .read-more {
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .read-more:hover {
-            text-decoration: underline;
-        }
-
-        .blog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .contact-section {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 3rem;
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 0.875rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            background: var(--bg-primary);
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        button {
-            background: var(--text-primary);
-            color: white;
-            padding: 0.875rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        button:hover {
-            background: var(--text-secondary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-
-        .social-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        .social-link:hover {
-            color: var(--text-primary);
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border);
-            margin-top: 4rem;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero p {
-                font-size: 1.1rem;
-            }
-
-            nav ul {
-                gap: 1rem;
-            }
-
-            .blog-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            nav .container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-right {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            nav ul {
-                flex-direction: column;
-                width: 100%;
-                text-align: center;
-            }
-
-            .theme-toggle {
-                margin: 0 auto;
-            }
-
-            .hero-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ghostwirez | Security Research</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #050505;
+    --bg2: #0a0a0a;
+    --bg3: #0f0f0f;
+    --green: #00ff88;
+    --green-dim: #00cc6a;
+    --green-muted: rgba(0,255,136,0.08);
+    --green-border: rgba(0,255,136,0.15);
+    --white: #e8e8e8;
+    --gray: #666;
+    --gray2: #444;
+    --red: #ff4444;
+    --cyan: #00d4ff;
+    --yellow: #ffcc00;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Cursor glow */
+  .cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,136,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* === NAV === */
+  nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(5,5,5,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--green-border);
+    z-index: 100;
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    color: var(--green);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-logo span { color: var(--white); }
+
+  .nav-links { display: flex; gap: 0.25rem; }
+
+  .nav-links a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 3px;
+    transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--green);
+    background: var(--green-muted);
+  }
+
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.65rem;
+    color: var(--gray);
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,255,136,0); }
+  }
+
+  /* === HERO === */
+  .hero {
+    padding: 140px 2rem 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    color: var(--green);
+    background: var(--green-muted);
+    border: 1px solid var(--green-border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  .hero-sub {
+    margin-top: 1.2rem;
+    font-size: 0.8rem;
+    color: var(--gray);
+    max-width: 520px;
+    line-height: 1.7;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-meta {
+    margin-top: 2rem;
+    display: flex;
+    gap: 2rem;
+    font-size: 0.7rem;
+    color: var(--gray2);
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-meta span { color: var(--green); }
+
+  /* Terminal prompt decoration */
+  .prompt-line {
+    font-size: 0.7rem;
+    color: var(--gray2);
+    margin-top: 2rem;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .prompt-line .p-green { color: var(--green); }
+  .prompt-line .p-cyan { color: var(--cyan); }
+  .prompt-line .cursor-blink {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--green);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* === FILTER BAR === */
+  .filter-bar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 0.65rem;
+    color: var(--gray2);
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--gray2);
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-muted); }
+  .filter-btn.active { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+  /* === POSTS GRID === */
+  .posts-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    font-size: 0.65rem;
+    color: var(--gray2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--green-border);
+  }
+
+  /* Featured post */
+  .post-featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--green-border);
+    background: var(--bg2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .post-featured:hover {
+    border-color: var(--green);
+    box-shadow: 0 0 40px rgba(0,255,136,0.06);
+  }
+
+  .post-featured .cover {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg3);
+    min-height: 260px;
+  }
+
+  .post-featured .cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    transition: opacity 0.3s, transform 0.4s;
+    display: block;
+  }
+
+  .post-featured:hover .cover img { opacity: 0.75; transform: scale(1.03); }
+
+  .cover-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,255,136,0.08) 0%, transparent 60%);
+  }
+
+  .pin-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    font-size: 0.55rem;
+    background: var(--green);
+    color: var(--bg);
+    padding: 0.2rem 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+
+  .post-featured .body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .post-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  .tag {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--green-border);
+    color: var(--green);
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .post-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--white);
+    transition: color 0.2s;
+  }
+
+  .post-featured:hover .post-title { color: var(--green); }
+
+  .post-excerpt {
+    font-size: 0.72rem;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  .post-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--green-border);
+    font-size: 0.65rem;
+    color: var(--gray2);
+  }
+
+  .read-more {
+    color: var(--green);
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: gap 0.2s;
+  }
+
+  .post-featured:hover .read-more { gap: 0.6rem; }
+
+  /* Grid posts */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+
+  .post-card {
+    border: 1px solid var(--green-border);
+    background: var(--bg2);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .post-card:hover {
+    border-color: var(--green);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0,255,136,0.06);
+  }
+
+  .post-card .cover {
+    height: 160px;
+    overflow: hidden;
+    background: var(--bg3);
+    position: relative;
+  }
+
+  .post-card .cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    transition: opacity 0.3s, transform 0.4s;
+    display: block;
+  }
+
+  .post-card:hover .cover img { opacity: 0.7; transform: scale(1.04); }
+
+  .no-image {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg3), var(--bg2));
+    font-size: 2rem;
+    opacity: 0.3;
+  }
+
+  .post-card .body {
+    padding: 1.2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .post-card .post-title {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .post-card .post-excerpt {
+    font-size: 0.68rem;
+    flex: 1;
+  }
+
+  .post-card .post-footer {
+    margin-top: auto;
+  }
+
+  /* === SIDEBAR / STATS === */
+  .stats-bar {
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--green-border);
+    border: 1px solid var(--green-border);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .stat {
+    background: var(--bg2);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--gray2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* === TOOLS SECTION === */
+  .tools-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 80px;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .tool-card {
+    border: 1px solid var(--green-border);
+    background: var(--bg2);
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .tool-card:hover {
+    border-color: var(--green);
+    box-shadow: 0 0 30px rgba(0,255,136,0.05);
+  }
+
+  .tool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .tool-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--green);
+    line-height: 1.3;
+  }
+
+  .tool-badge {
+    font-size: 0.55rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--green-muted);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+    border-radius: 2px;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .tool-desc {
+    font-size: 0.7rem;
+    color: var(--gray);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+
+  .tool-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+
+  .tool-tag {
+    font-size: 0.58rem;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--gray2);
+    color: var(--gray);
+    border-radius: 2px;
+  }
+
+  .tool-link {
+    font-size: 0.68rem;
+    color: var(--green);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: gap 0.2s;
+  }
+
+  .tool-link:hover { gap: 0.5rem; }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--green-border);
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: 0.65rem;
+    color: var(--gray2);
+  }
+
+  .footer-copy { display: flex; align-items: center; gap: 0.5rem; }
+  .footer-copy .bracket { color: var(--green); }
+
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: var(--gray2); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--green); }
+
+  /* === PAGE VIEWS (tabs) === */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === MOBILE === */
+  @media (max-width: 768px) {
+    nav { padding: 0 1rem; }
+    .nav-status { display: none; }
+    .hero { padding: 100px 1rem 60px; }
+    .posts-section, .filter-bar, .stats-bar, .tools-section { padding-left: 1rem; padding-right: 1rem; }
+    .post-featured { grid-template-columns: 1fr; }
+    .post-featured .cover { min-height: 180px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .posts-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+
+  /* Search bar */
+  .search-wrap {
+    position: relative;
+    margin-right: auto;
+    margin-left: 1rem;
+    display: none;
+  }
+
+  @media (min-width: 600px) { .search-wrap { display: block; } }
+
+  .search-input {
+    background: var(--bg3);
+    border: 1px solid var(--gray2);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.75rem 0.35rem 1.8rem;
+    border-radius: 2px;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.2s, width 0.3s;
+  }
+
+  .search-input:focus { border-color: var(--green); width: 250px; }
+  .search-input::placeholder { color: var(--gray2); }
+
+  .search-icon {
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray2);
+    font-size: 0.65rem;
+    pointer-events: none;
+  }
+
+  /* Highlight on search */
+  .post-card.hidden, .post-featured.hidden { display: none; }
+
+  /* Category pills in post list */
+  .cat-pill {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: center;
+    font-size: 0.58rem;
+    color: var(--green-dim);
+  }
+
+  /* Read time indicator bar */
+  .read-bar {
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    border-radius: 1px;
+    margin-bottom: 0.8rem;
+    transition: width 0.3s;
+  }
+</style>
 </head>
 <body>
-    <nav>
-        <div class="container">
-            <a href="#home" class="logo">Security Portfolio</a>
-            <div class="nav-right">
-                <ul>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#skills">Expertise</a></li>
-                    <li><a href="#projects">Work</a></li>
-                    <li><a href="#blog">Blog</a></li>
-                    <li><a href="#certifications">Certifications</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                    <span id="themeIcon">🌙</span>
-                </button>
-            </div>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home')">ghost<span>wirez</span></a>
+
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" type="text" placeholder="search posts..." id="searchInput" oninput="filterSearch(this.value)"/>
+  </div>
+
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage('home',this)">Home</a>
+    <a href="#" onclick="showPage('blog',this)">Blog</a>
+    <a href="#" onclick="showPage('tools',this)">Tools</a>
+    <a href="#" onclick="showPage('about',this)">About</a>
+  </div>
+
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>sys online</span>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">// security research &amp; red team notes</div>
+    <h1>Penetration Tester<br/><em>Security Researcher</em></h1>
+    <p class="hero-sub">Documenting offensive security research, red team tradecraft, and privacy analysis. All operations are authorized. All findings are disclosed responsibly.</p>
+    <div class="hero-meta">
+      <div>Posts <span>12</span></div>
+      <div>Tools <span>3</span></div>
+      <div>CVEs <span>—</span></div>
+      <div>Certs <span>OSCP · CRTO</span></div>
+    </div>
+    <div class="prompt-line">
+      <span class="p-green">┌──(</span><span class="p-cyan">ghostwirez@sec</span><span class="p-green">)-[</span>~/blog<span class="p-green">]</span><br/>
+      <span class="p-green">└─$</span> cat latest_posts.txt<span class="cursor-blink"></span>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Posts Published</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Open Source Tools</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">6</div>
+      <div class="stat-label">Research Areas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">2026</div>
+      <div class="stat-label">Last Updated</div>
+    </div>
+  </div>
+
+  <!-- POSTS -->
+  <section class="posts-section">
+    <div class="section-header">// latest posts</div>
+
+    <!-- Featured -->
+    <a class="post-featured" href="#" onclick="openPost('kape');return false;" data-tags="privacy">
+      <div class="cover">
+        <img src="https://pbs.twimg.com/media/HC-_KjIXUAACOsu?format=jpg&name=small" alt=""/>
+        <div class="cover-overlay"></div>
+        <span class="pin-badge">★ pinned</span>
+      </div>
+      <div class="body">
+        <div>
+          <div class="post-tags">
+            <span class="tag">Privacy</span>
+            <span class="tag">Investigation</span>
+          </div>
         </div>
-    </nav>
-
-    <section id="home" class="hero">
-        <h1>Offensive Security Engineer</h1>
-        <p>Specializing in penetration testing, red team operations, and security research to help organizations identify and remediate critical vulnerabilities before adversaries do.</p>
-        <div class="hero-meta">
-            <span>📍 Remote / Global</span>
-            <span>🎯 Available for Consulting</span>
-            <span>🔒 CRTO* | CPTS | CWES</span>
+        <div>
+          <div style="margin-bottom:0.5rem"><div class="read-bar" style="width:85%"></div></div>
+          <div class="post-title">One Company Owns Your VPN, Your Backup VPN, and the Website That Told You to Use Both</div>
         </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <section id="blog">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Latest Posts</h2>
-                <p class="section-subtitle">Technical writeups, research, and security insights</p>
-            </div>
-            <div class="blog-grid">
-                <a href="posts/privilege-escalation.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Dec 18, 2024</span>
-                        <span>⏱️ 10 min read</span>
-                    </div>
-                    <h3>Breaking Down Advanced Privilege Escalation Techniques in Windows</h3>
-                    <p>A comprehensive guide to understanding and exploiting privilege escalation vulnerabilities in Windows Active Directory environments, including practical examples and mitigation strategies.</p>
-                    <div class="project-tags">
-                        <span class="tag">Privilege Escalation</span>
-                        <span class="tag">Windows</span>
-                        <span class="tag">Active Directory</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-
-                <a href="posts/edr-bypass.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Dec 10, 2024</span>
-                        <span>⏱️ 15 min read</span>
-                    </div>
-                    <h3>Modern EDR Bypass Techniques</h3>
-                    <p>A deep dive into techniques for evading endpoint detection and response solutions, including process injection, memory manipulation, and obfuscation methods used in real-world engagements.</p>
-                    <div class="project-tags">
-                        <span class="tag">EDR Bypass</span>
-                        <span class="tag">Red Teaming</span>
-                        <span class="tag">Evasion</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-
-                <a href="posts/ad-exploitation.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Nov 28, 2024</span>
-                        <span>⏱️ 12 min read</span>
-                    </div>
-                    <h3>Exploiting Active Directory Trust Relationships</h3>
-                    <p>Learn how attackers leverage trust relationships between domains to move laterally and escalate privileges across forest boundaries in complex enterprise environments.</p>
-                    <div class="project-tags">
-                        <span class="tag">Active Directory</span>
-                        <span class="tag">Lateral Movement</span>
-                        <span class="tag">Domain Trusts</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-
-                <a href="posts/cloud-security.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Nov 15, 2024</span>
-                        <span>⏱️ 8 min read</span>
-                    </div>
-                    <h3>AWS Pentesting: From S3 Buckets to IAM Privilege Escalation</h3>
-                    <p>Practical techniques for identifying and exploiting common AWS misconfigurations, including IAM policy abuse, S3 bucket enumeration, and Lambda function vulnerabilities.</p>
-                    <div class="project-tags">
-                        <span class="tag">Cloud Security</span>
-                        <span class="tag">AWS</span>
-                        <span class="tag">Pentesting</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-
-                <a href="posts/red-team-infra.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Oct 30, 2024</span>
-                        <span>⏱️ 20 min read</span>
-                    </div>
-                    <h3>Building Your Own Red Team Infrastructure</h3>
-                    <p>Step-by-step guide to setting up a professional red team infrastructure including command and control servers, redirectors, payload hosting, and operational security considerations.</p>
-                    <div class="project-tags">
-                        <span class="tag">Red Team</span>
-                        <span class="tag">Infrastructure</span>
-                        <span class="tag">C2</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-
-                <a href="posts/web-app-hacking.html" class="blog-post-card">
-                    <div class="blog-post-meta">
-                        <span>📅 Oct 12, 2024</span>
-                        <span>⏱️ 14 min read</span>
-                    </div>
-                    <h3>Advanced Web Application Exploitation Techniques</h3>
-                    <p>Exploring sophisticated web application vulnerabilities beyond OWASP Top 10, including business logic flaws, race conditions, and complex authentication bypass scenarios.</p>
-                    <div class="project-tags">
-                        <span class="tag">Web Security</span>
-                        <span class="tag">Bug Bounty</span>
-                        <span class="tag">OWASP</span>
-                    </div>
-                    <p class="read-more">Read more →</p>
-                </a>
-            </div>
+        <p class="post-excerpt">DOJ charged ex-US intel for UAE spyware. One was ExpressVPN's CIO — revealed one day after Kape bought ExpressVPN for $936M. The adware company that now holds the keys to your traffic.</p>
+        <div class="post-footer">
+          <span>Mar 10, 2026 · 17 min read</span>
+          <span class="read-more">Read post →</span>
         </div>
-    </section>
+      </div>
+    </a>
 
-    <div class="divider"></div>
+    <!-- Grid -->
+    <div class="posts-grid" id="postsGrid">
 
-    <section id="about">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">About Me</h2>
-                <p class="section-subtitle">Building security through adversarial thinking</p>
-            </div>
-            <div class="about-content">
-                <p>
-                    I’m an Offensive Security Engineer specializing in Red Team operations, with hands-on experience in security assessments, vulnerability exploitation, and web application penetration testing. I help organizations proactively identify, validate, and remediate security gaps before they can be abused by real-world attackers.
-                </p>
-                <p>
-                    I believe that effective defense starts with understanding the attacker mindset. My approach combines offensive and defensive security practices with continuous learning, allowing me to uncover complex issues that go beyond surface-level findings. I’m driven by a strong passion for solving challenging security problems in an ever-evolving threat landscape.
-                </p>
-                <p>
-                    Beyond technical work, I’m the founder of CyberwireZ, a Filipino cybersecurity community focused on collaboration and knowledge sharing. Through community building and security research, I strive to contribute to the growth of the local and global cybersecurity ecosystem while continuously sharpening my skills as a security professional.
-                </p>
-            </div>
-
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number">100+</div>
-                    <div class="stat-label">Security Assessments</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">200+</div>
-                    <div class="stat-label">Vulnerabilities Found</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">CVEs Discovered</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">98%</div>
-                    <div class="stat-label">Client Satisfaction</div>
-                </div>
-            </div>
+      <a class="post-card" href="#" onclick="return false;" data-tags="anti-forensics" style="animation-delay:0.05s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HCLAt8kbMAAG95h?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Anti-Forensics</span></div>
+          <div class="read-bar" style="width:60%"></div>
+          <div class="post-title">Anti-Forensics 101: File Timestamp Manipulation</div>
+          <p class="post-excerpt">Timestamps are just metadata — and metadata is incredibly easy to manipulate. Understanding $STANDARD_INFORMATION vs $FILE_NAME and why clumsiness leaves more evidence than doing nothing.</p>
+          <div class="post-footer"><span>Mar 6, 2026 · 6 min</span><span class="read-more">Read →</span></div>
         </div>
-    </section>
+      </a>
 
-    <div class="divider"></div>
-
-    <section id="skills">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Areas of Expertise</h2>
-                <p class="section-subtitle">Technical skills and methodologies I employ in security assessments</p>
-            </div>
-            <div class="skills-container">
-                <div class="skill-category">
-                    <h3>Penetration Testing</h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Network Security Testing</span>
-                        <span class="skill-item">Web Application Security</span>
-                        <span class="skill-item">Mobile Application Testing</span>
-                        <span class="skill-item">API Security</span>
-                        <span class="skill-item">Cloud Infrastructure (AWS/Azure/GCP)</span>
-                        <span class="skill-item">Wireless Security</span>
-                        <span class="skill-item">Physical Security</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Red Team Operations</h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Initial Access</span>
-                        <span class="skill-item">Command & Control</span>
-                        <span class="skill-item">Lateral Movement</span>
-                        <span class="skill-item">Privilege Escalation</span>
-                        <span class="skill-item">Persistence Mechanisms</span>
-                        <span class="skill-item">Data Exfiltration</span>
-                        <span class="skill-item">Adversary Simulation</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Technical Skills</h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Python</span>
-                        <span class="skill-item">PowerShell</span>
-                        <span class="skill-item">Bash/Shell Scripting</span>
-                        <span class="skill-item">C/C++</span>
-                        <span class="skill-item">Go</span>
-                        <span class="skill-item">JavaScript</span>
-                        <span class="skill-item">SQL</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Tools & Frameworks</h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Burp Suite Pro</span>
-                        <span class="skill-item">Metasploit Framework</span>
-                        <span class="skill-item">Cobalt Strike</span>
-                        <span class="skill-item">BloodHound</span>
-                        <span class="skill-item">Empire/Covenant</span>
-                        <span class="skill-item">Nmap</span>
-                        <span class="skill-item">Wireshark</span>
-                    </div>
-                </div>
-            </div>
+      <a class="post-card" href="#" onclick="return false;" data-tags="anti-forensics" style="animation-delay:0.1s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HCF6nlfX0AA5XAN?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Anti-Forensics</span></div>
+          <div class="read-bar" style="width:40%"></div>
+          <div class="post-title">Anti-Forensics 101: Data Wiping</div>
+          <p class="post-excerpt">Deleting a file doesn't make it disappear. On HDDs the data stays until overwritten. On modern SSDs with TRIM + encryption, it's usually gone for good. The real story is more nuanced.</p>
+          <div class="post-footer"><span>Feb 26, 2026 · 4 min</span><span class="read-more">Read →</span></div>
         </div>
-    </section>
+      </a>
 
-    <div class="divider"></div>
-
-    <section id="projects">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Featured Work</h2>
-                <p class="section-subtitle">Selected engagements and security research projects</p>
-            </div>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>Enterprise Network Assessment</h3>
-                    <p>Conducted comprehensive internal and external penetration testing for a Fortune 500 financial services company. Identified critical vulnerabilities in their infrastructure, achieved domain compromise, and provided strategic remediation guidance.</p>
-                    <div class="project-tags">
-                        <span class="tag">Network Pentesting</span>
-                        <span class="tag">Active Directory</span>
-                        <span class="tag">Privilege Escalation</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Red Team Operation</h3>
-                    <p>Led a 6-week adversary simulation for a healthcare organization. Successfully bypassed EDR solutions, maintained persistence, and demonstrated the impact of a sophisticated threat actor through lateral movement and data exfiltration scenarios.</p>
-                    <div class="project-tags">
-                        <span class="tag">Red Teaming</span>
-                        <span class="tag">EDR Bypass</span>
-                        <span class="tag">Social Engineering</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>SaaS Platform Security Review</h3>
-                    <p>Performed in-depth security assessment of a multi-tenant SaaS application. Discovered authentication bypass, broken access controls, and business logic flaws that could lead to cross-tenant data access.</p>
-                    <div class="project-tags">
-                        <span class="tag">Web Security</span>
-                        <span class="tag">API Testing</span>
-                        <span class="tag">OWASP Top 10</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Cloud Security Assessment</h3>
-                    <p>Evaluated AWS environment security for a technology startup. Identified misconfigured IAM policies, exposed S3 buckets, and privilege escalation paths. Delivered comprehensive cloud security architecture recommendations.</p>
-                    <div class="project-tags">
-                        <span class="tag">AWS</span>
-                        <span class="tag">Cloud Security</span>
-                        <span class="tag">IAM</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Custom Exploit Development</h3>
-                    <p>Researched and developed proof-of-concept exploits for zero-day vulnerabilities in enterprise software. Responsibly disclosed findings to affected vendors and received CVE assignments.</p>
-                    <div class="project-tags">
-                        <span class="tag">0-day Research</span>
-                        <span class="tag">Exploit Dev</span>
-                        <span class="tag">CVE</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Security Automation Tools</h3>
-                    <p>Developed open-source security tools for reconnaissance automation, vulnerability validation, and post-exploitation activities. Tools have been adopted by security professionals worldwide with 2,000+ GitHub stars.</p>
-                    <div class="project-tags">
-                        <span class="tag">Tool Development</span>
-                        <span class="tag">Python</span>
-                        <span class="tag">Open Source</span>
-                    </div>
-                </div>
-            </div>
+      <a class="post-card" href="#" onclick="return false;" data-tags="privacy" style="animation-delay:0.15s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HAw6zH3akAAKGwW?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Privacy</span><span class="tag">Surveillance</span></div>
+          <div class="read-bar" style="width:60%"></div>
+          <div class="post-title">Inside Predictive Surveillance: How They Watch Before You Act</div>
+          <p class="post-excerpt">Surveillance no longer asks "what did you do?" It asks "what will you do?" Your behavioral fingerprint predicts and pre-judges you before you've acted.</p>
+          <div class="post-footer"><span>Feb 10, 2026 · 6 min</span><span class="read-more">Read →</span></div>
         </div>
-    </section>
+      </a>
 
-    <div class="divider"></div>
-
-    <section id="certifications">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Certifications</h2>
-                <p class="section-subtitle">Professional certifications and credentials</p>
-            </div>
-            <div class="cert-list">
-                <div class="cert-item">
-                    <div class="cert-icon">O</div>
-                    <div class="cert-info">
-                        <h4>CRTO*</h4>
-                        <p>Certified Red Team Operator</p>
-                    </div>
-                </div>
-                <div class="cert-item">
-                    <div class="cert-icon">O</div>
-                    <div class="cert-info">
-                        <h4>CPTS</h4>
-                        <p>Certified Penetration Testing Specialist</p>
-                    </div>
-                </div>
-                <div class="cert-item">
-                    <div class="cert-icon">G</div>
-                    <div class="cert-info">
-                        <h4>CWES</h4>
-                        <p>Certified Web Exploitation Specialist</p>
-                    </div>
-                </div>
-                <div class="cert-item">
-                    <div class="cert-icon">G</div>
-                    <div class="cert-info">
-                        <h4>CRTA</h4>
-                        <p>Certified Red Team Analyst</p>
-                    </div>
-                </div>
-                <div class="cert-item">
-                    <div class="cert-icon">C</div>
-                    <div class="cert-info">
-                        <h4>ACP</h4>
-                        <p>APISEC Certified Practitioner</p>
-                    </div>
-                </div>
-                <div class="cert-item">
-                    <div class="cert-icon">E</div>
-                    <div class="cert-info">
-                        <h4>HCIA-AI</h4>
-                        <p>Huawei Certified ICT Associate - Artificial Intelligence</p>
-                    </div>
-                </div>
-            </div>
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.2s">
+        <div class="cover"><img src="https://miro.medium.com/v2/format:webp/0*n0BI7sFz17OtRzxg.png" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">APT</span></div>
+          <div class="read-bar" style="width:40%"></div>
+          <div class="post-title">When npm install Gets You Hacked: Famous Chollima Job Scam Simulation</div>
+          <p class="post-excerpt">North Korean APT weaponizing fake GitHub job repos. A red team simulation of the full chain — social engineering, XOR-encrypted payloads, and silent C2 via npm postinstall.</p>
+          <div class="post-footer"><span>Jul 11, 2025 · 4 min</span><span class="read-more">Read →</span></div>
         </div>
-    </section>
+      </a>
 
-    <div class="divider"></div>
-
-    <section id="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Get in Touch</h2>
-                <p class="section-subtitle">Interested in working together? Let's discuss your security needs</p>
-            </div>
-            <div class="contact-section">
-                <form>
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Your name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" name="subject" placeholder="What would you like to discuss?" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" placeholder="Tell me about your project or inquiry..." required></textarea>
-                    </div>
-                    <button type="submit">Send Message</button>
-                </form>
-                <div class="social-links">
-                    <a href="https://www.linkedin.com/in/arvinrafaellegaspi" class="social-link">LinkedIn</a>
-                    <a href="https://github.com/ghostwirez" class="social-link">GitHub</a>
-                    <a href="https://discord.com/servers/cyberwirez-1001875012715827291" class="social-link">Discord</a>
-                    <a href="https://x.com/aaarbiin" class="social-link">X (formerly Twitter)</a>
-                    <a href="mailto:legaspi.arvinrafael@gmail.com" class="social-link">Email</a>
-                </div>
-            </div>
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.25s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/GuI9LBeWcAAW_Tr?format=png&name=medium" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">Social Engineering</span></div>
+          <div class="read-bar" style="width:30%"></div>
+          <div class="post-title">FileFix: Launching PowerShell via the File Explorer Address Bar</div>
+          <p class="post-excerpt">A social engineering technique that tricks victims into pasting a disguised PowerShell command into File Explorer. No exploits. No admin rights. Just OS trust and bad habits.</p>
+          <div class="post-footer"><span>Jun 25, 2025 · 3 min</span><span class="read-more">Read →</span></div>
         </div>
-    </section>
+      </a>
 
-    <footer>
-        <p>© 2025 Security Portfolio. All rights reserved.</p>
-    </footer>
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.3s">
+        <div class="cover"><img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/0*lQDgQbOTWjJbnYLg.jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">LOTL</span></div>
+          <div class="read-bar" style="width:90%"></div>
+          <div class="post-title">How to Hijack a Windows System with Nothing but Built-in Tools</div>
+          <p class="post-excerpt">Multi-stage HTA phishing simulation using only native Windows binaries. No implants, no custom executables — just mshta.exe, WScript, PowerShell, and registry persistence.</p>
+          <div class="post-footer"><span>Jun 13, 2025 · 9 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
 
-    <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const html = document.documentElement;
+    </div>
+  </section>
+</div>
 
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', currentTheme);
-        updateThemeIcon(currentTheme);
+<!-- BLOG PAGE -->
+<div class="page" id="page-blog">
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="hero-tag">// all posts</div>
+    <h1>Blog</h1>
+    <p class="hero-sub">Writing mostly because I 'love' it. Research notes, techniques, and deep dives into offensive security and privacy.</p>
+  </section>
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
+  <div class="filter-bar">
+    <span class="filter-label">filter:</span>
+    <button class="filter-btn active" onclick="filterPosts('all',this)">All</button>
+    <button class="filter-btn" onclick="filterPosts('red-team',this)">Red Teaming</button>
+    <button class="filter-btn" onclick="filterPosts('privacy',this)">Privacy</button>
+    <button class="filter-btn" onclick="filterPosts('anti-forensics',this)">Anti-Forensics</button>
+    <button class="filter-btn" onclick="filterPosts('opsec',this)">OPSEC</button>
+    <button class="filter-btn" onclick="filterPosts('ctf',this)">CTF</button>
+  </div>
 
-        function updateThemeIcon(theme) {
-            themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
-        }
+  <section class="posts-section">
+    <div class="section-header">// research index</div>
+    <div class="posts-grid" id="blogGrid">
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
+      <a class="post-card" href="#" onclick="return false;" data-tags="privacy" style="animation-delay:0s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HC-_KjIXUAACOsu?format=jpg&name=small" alt=""/><div class="cover-overlay"></div><span class="pin-badge">★</span></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Privacy</span></div>
+          <div class="read-bar" style="width:85%"></div>
+          <div class="post-title">One Company Owns Your VPN, Your Backup VPN, and the Website That Told You to Use Both</div>
+          <p class="post-excerpt">Kape Technologies — formerly Crossrider adware — now owns ExpressVPN, PIA, CyberGhost, and the review sites that rank them.</p>
+          <div class="post-footer"><span>Mar 10, 2026 · 17 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
 
-        // Form submission (placeholder)
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your message! This is a demo form. In production, this would send your message.');
-        });
-    </script>
+      <a class="post-card" href="#" onclick="return false;" data-tags="anti-forensics" style="animation-delay:0.05s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HCLAt8kbMAAG95h?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Anti-Forensics</span></div>
+          <div class="read-bar" style="width:60%"></div>
+          <div class="post-title">Anti-Forensics 101: File Timestamp Manipulation</div>
+          <p class="post-excerpt">$SI vs $FN attributes, nanosecond precision, double timestomping, and why the MFT sequence number exposes you anyway.</p>
+          <div class="post-footer"><span>Mar 6, 2026 · 6 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="anti-forensics" style="animation-delay:0.1s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HCF6nlfX0AA5XAN?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Anti-Forensics</span></div>
+          <div class="read-bar" style="width:40%"></div>
+          <div class="post-title">Anti-Forensics 101: Data Wiping</div>
+          <p class="post-excerpt">shred, cipher /w, hdparm Secure Erase, and why physical destruction is the only guarantee at high threat models.</p>
+          <div class="post-footer"><span>Feb 26, 2026 · 4 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="privacy" style="animation-delay:0.15s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HAw6zH3akAAKGwW?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Privacy</span><span class="tag">Surveillance</span></div>
+          <div class="read-bar" style="width:60%"></div>
+          <div class="post-title">Inside Predictive Surveillance: How They Watch Before You Act</div>
+          <p class="post-excerpt">Behavioral fingerprinting, correlation pipelines, and how opting out itself becomes a flag.</p>
+          <div class="post-footer"><span>Feb 10, 2026 · 6 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="privacy" style="animation-delay:0.2s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HAhCMy7WQAAV4TY?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Privacy</span></div>
+          <div class="read-bar" style="width:60%"></div>
+          <div class="post-title">Social Graph Reconstruction</div>
+          <p class="post-excerpt">Why metadata beats content. How connection graphs expose power dynamics, leadership, and identity — even without reading a single message.</p>
+          <div class="post-footer"><span>Feb 9, 2026 · 6 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="privacy" style="animation-delay:0.25s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/HAbTGg-WwAAe6Bn?format=jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Privacy</span><span class="tag">Email</span></div>
+          <div class="read-bar" style="width:40%"></div>
+          <div class="post-title">There's No Perfect Private Email</div>
+          <p class="post-excerpt">Proton, Tuta, SimpleLogin, self-hosted — every option has a different threat surface. Understanding what each actually protects.</p>
+          <div class="post-footer"><span>Feb 5, 2026 · 4 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.3s">
+        <div class="cover"><img src="https://miro.medium.com/v2/format:webp/0*n0BI7sFz17OtRzxg.png" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">APT</span></div>
+          <div class="read-bar" style="width:40%"></div>
+          <div class="post-title">When npm install Gets You Hacked: Famous Chollima Simulation</div>
+          <p class="post-excerpt">North Korean APT job scam methodology — malicious postinstall scripts, XOR-encrypted Python reverse shells, C++ C2 listener. Full chain documented.</p>
+          <div class="post-footer"><span>Jul 11, 2025 · 4 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.35s">
+        <div class="cover"><img src="https://pbs.twimg.com/media/GuI9LBeWcAAW_Tr?format=png&name=medium" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">Social Engineering</span></div>
+          <div class="read-bar" style="width:30%"></div>
+          <div class="post-title">FileFix: PowerShell via File Explorer Address Bar</div>
+          <p class="post-excerpt">A ClickFix variant. Phishing page that copies a hidden PowerShell command to clipboard, disguised as a file path. Zero exploits, zero footprint until execution.</p>
+          <div class="post-footer"><span>Jun 25, 2025 · 3 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+      <a class="post-card" href="#" onclick="return false;" data-tags="red-team" style="animation-delay:0.4s">
+        <div class="cover"><img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/0*lQDgQbOTWjJbnYLg.jpg" alt=""/><div class="cover-overlay"></div></div>
+        <div class="body">
+          <div class="post-tags"><span class="tag">Red Team</span><span class="tag">LOTL</span></div>
+          <div class="read-bar" style="width:90%"></div>
+          <div class="post-title">Hijacking Windows with Only Built-in Tools</div>
+          <p class="post-excerpt">HTA → VBScript → hidden PowerShell → registry persistence. A full multi-stage attack chain using zero custom binaries. MITRE ATT&CK techniques documented.</p>
+          <div class="post-footer"><span>Jun 13, 2025 · 9 min</span><span class="read-more">Read →</span></div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+</div>
+
+<!-- TOOLS PAGE -->
+<div class="page" id="page-tools">
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="hero-tag">// open source arsenal</div>
+    <h1>Tools <em>&gt;</em> Development</h1>
+    <p class="hero-sub">Custom security tools built for red team operations and research. All open source. Use responsibly.</p>
+  </section>
+
+  <section class="tools-section">
+    <div class="section-header">// tool index</div>
+    <div class="tools-grid">
+
+      <div class="tool-card" style="animation-delay:0s">
+        <div class="tool-header">
+          <div class="tool-name">Evasion &amp; Anti-Analysis Detector</div>
+          <span class="tool-badge">Python</span>
+        </div>
+        <p class="tool-desc">Red-team focused PE analysis tool that detects evasion techniques, anti-analysis patterns, and suspicious characteristics in Windows executables. Detects direct syscall patterns, API hashing, RWX sections, reflective DLL loaders, AMSI bypass patterns, and ETW patching indicators with weighted risk scoring.</p>
+        <div class="tool-tags">
+          <span class="tool-tag">PE Analysis</span>
+          <span class="tool-tag">Evasion Detection</span>
+          <span class="tool-tag">Anti-Analysis</span>
+          <span class="tool-tag">Risk Scoring</span>
+        </div>
+        <a class="tool-link" href="https://github.com/T3chfalcon/Evasion-Anti-Analysis-Detector" target="_blank" rel="noopener">GitHub →</a>
+      </div>
+
+      <div class="tool-card" style="animation-delay:0.1s">
+        <div class="tool-header">
+          <div class="tool-name">Loader Fingerprinting Tool</div>
+          <span class="tool-badge">Python</span>
+        </div>
+        <p class="tool-desc">Static-analysis tradecraft classifier for Windows loaders. Analyzes PE files to identify execution models, injection intent, API resolution methods, payload styles, and evasion posture. Classifies how a binary plans to execute code and what execution philosophy the author uses.</p>
+        <div class="tool-tags">
+          <span class="tool-tag">Static Analysis</span>
+          <span class="tool-tag">PE Analysis</span>
+          <span class="tool-tag">Loader Classification</span>
+          <span class="tool-tag">Tradecraft</span>
+        </div>
+        <a class="tool-link" href="https://github.com/T3chfalcon/Loader-Fingerprinting-Tool" target="_blank" rel="noopener">GitHub →</a>
+      </div>
+
+      <div class="tool-card" style="animation-delay:0.2s">
+        <div class="tool-header">
+          <div class="tool-name">Malware Report Auto-Writer</div>
+          <span class="tool-badge">Python · Jinja</span>
+        </div>
+        <p class="tool-desc">Automated malware analysis reporting engine that translates technical findings into professional, human-readable reports. Generates deterministic reports in Markdown, HTML, or PDF formats with specialized sections for evasion techniques and execution philosophies.</p>
+        <div class="tool-tags">
+          <span class="tool-tag">Malware Analysis</span>
+          <span class="tool-tag">Reporting</span>
+          <span class="tool-tag">Automation</span>
+          <span class="tool-tag">CLI</span>
+        </div>
+        <a class="tool-link" href="https://github.com/T3chfalcon/Malware-Report-Auto-Writer" target="_blank" rel="noopener">GitHub →</a>
+      </div>
+
+    </div>
+
+    <div style="margin-top:3rem;font-size:0.65rem;color:var(--gray2)">
+      <p>// All tools are open source and available on GitHub</p>
+      <p style="margin-top:0.25rem">// Contributions and feedback are welcome</p>
+      <p style="margin-top:0.25rem">// Use responsibly and ethically</p>
+    </div>
+  </section>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="hero-tag">// whoami</div>
+    <h1>About <em>me</em></h1>
+  </section>
+
+  <section class="posts-section">
+    <div style="border:1px solid var(--green-border);background:var(--bg2);border-radius:4px;padding:2rem;max-width:640px;animation:fadeUp 0.5s ease both">
+      <div style="font-size:0.75rem;line-height:1.9;color:var(--gray)">
+        <p style="color:var(--white);margin-bottom:1rem">Penetration tester and security researcher focused on offensive operations and privacy research.</p>
+        <p style="margin-bottom:0.75rem">I write about <span style="color:var(--green)">red team tradecraft</span>, <span style="color:var(--green)">anti-forensics</span>, <span style="color:var(--green)">privacy</span>, and occasionally document APT techniques through controlled simulations.</p>
+        <p style="margin-bottom:0.75rem">All research is conducted in authorized environments or on personal lab infrastructure.</p>
+        <p>Content is published for educational and defensive awareness purposes.</p>
+      </div>
+
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--green-border);display:flex;gap:1.5rem;font-size:0.65rem">
+        <a href="https://github.com/t3chfalcon" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">GitHub →</a>
+        <a href="https://x.com/sec_alegaspi" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">Twitter/X →</a>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;font-size:0.65rem;color:var(--gray2)">
+      <p class="p-green" style="color:var(--green)">&gt; Authorized access only</p>
+      <p style="margin-top:0.25rem">&gt; All operations are logged</p>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">
+    <span class="bracket">[</span>
+    <span>© 2026 ghostwirez</span>
+    <span class="bracket">]</span>
+  </div>
+  <div class="footer-links">
+    <a href="#" onclick="showPage('about')">About</a>
+    <a href="https://github.com/t3chfalcon" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</footer>
+
+<script>
+// Cursor glow
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+// Page switching
+function showPage(id, linkEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  if (linkEl) linkEl.classList.add('active');
+  else {
+    const links = document.querySelectorAll('.nav-links a');
+    links.forEach(a => {
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').includes(id)) a.classList.add('active');
+    });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Filter by category
+function filterPosts(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('#blogGrid .post-card');
+  cards.forEach(card => {
+    if (cat === 'all' || card.dataset.tags === cat) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+
+// Search
+function filterSearch(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.post-card, .post-featured').forEach(card => {
+    const title = card.querySelector('.post-title')?.textContent.toLowerCase() || '';
+    const excerpt = card.querySelector('.post-excerpt')?.textContent.toLowerCase() || '';
+    if (!q || title.includes(q) || excerpt.includes(q)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+
+// Open post placeholder
+function openPost(id) {
+  // In a full implementation this would navigate to a post page
+  // For now just a visual indicator
+  alert('Post: ' + id + '\n\n(In a full build, this would open the post page.)');
+}
+</script>
 </body>
 </html>
