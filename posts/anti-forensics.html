@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Anti-Forensics 101: File Timestamp Manipulation | ghostwirez</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #050505;
+    --bg2: #0a0a0a;
+    --bg3: #0f0f0f;
+    --green: #00ff88;
+    --green-dim: #00cc6a;
+    --green-muted: rgba(0,255,136,0.07);
+    --green-border: rgba(0,255,136,0.14);
+    --white: #e8e8e8;
+    --gray: #777;
+    --gray2: #444;
+    --cyan: #00d4ff;
+    --yellow: #ffcc00;
+    --red: #ff5555;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* === NAV === */
+  nav {
+    position: fixed;
+    top: 0; width: 100%;
+    background: rgba(5,5,5,0.93);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--green-border);
+    z-index: 100;
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo { color: var(--green); font-size: 1rem; font-weight: 700; text-decoration: none; }
+  .nav-logo span { color: var(--white); }
+
+  .nav-links { display: flex; gap: 0.25rem; }
+  .nav-links a {
+    color: var(--gray); text-decoration: none; font-size: 0.75rem;
+    padding: 0.4rem 0.75rem; border-radius: 3px; transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .nav-links a:hover { color: var(--green); background: var(--green-muted); }
+
+  .nav-status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.65rem; color: var(--gray); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); } 50% { opacity:.7; box-shadow: 0 0 0 4px rgba(0,255,136,0); } }
+
+  /* === LAYOUT === */
+  .wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 88px 2rem 80px;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .wrapper { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    nav { padding: 0 1rem; }
+    .nav-status { display: none; }
+  }
+
+  /* === BREADCRUMB === */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.65rem;
+    color: var(--gray2);
+    margin-bottom: 2rem;
+    animation: fadeUp 0.4s ease both;
+  }
+  .breadcrumb a { color: var(--green); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--gray2); }
+
+  /* === POST HEADER === */
+  .post-header { animation: fadeUp 0.5s 0.05s ease both; }
+
+  .post-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .tag {
+    font-size: 0.6rem; padding: 0.2rem 0.5rem;
+    border: 1px solid var(--green-border); color: var(--green);
+    border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .tag-alt { border-color: var(--gray2); color: var(--gray); }
+
+  .post-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.65rem;
+    color: var(--gray2);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--green-border);
+    flex-wrap: wrap;
+  }
+
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; }
+  .meta-item .dot { color: var(--green); }
+
+  /* Progress bar */
+  .read-progress {
+    position: fixed;
+    top: 56px; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    z-index: 99;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* === COVER IMAGE === */
+  .cover-wrap {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--green-border);
+    margin-bottom: 2.5rem;
+    position: relative;
+    background: var(--bg3);
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .cover-wrap img {
+    width: 100%; max-height: 360px;
+    object-fit: cover;
+    display: block;
+    opacity: 0.65;
+  }
+
+  .cover-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(5,5,5,0.8) 100%);
+  }
+
+  /* === ARTICLE BODY === */
+  .post-body {
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: #c0c0c0;
+    animation: fadeUp 0.5s 0.15s ease both;
+  }
+
+  .post-body p { margin-bottom: 1.3rem; }
+
+  .post-body h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--green);
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--green-border);
+    letter-spacing: -0.01em;
+  }
+
+  .post-body h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--white);
+    margin: 2rem 0 0.75rem;
+  }
+
+  .post-body strong { color: var(--white); font-weight: 600; }
+  .post-body em { color: var(--cyan); font-style: normal; }
+
+  .post-body a { color: var(--green); text-decoration: none; border-bottom: 1px solid var(--green-border); transition: border-color 0.2s; }
+  .post-body a:hover { border-color: var(--green); }
+
+  /* Code blocks */
+  .post-body pre {
+    background: var(--bg3);
+    border: 1px solid var(--green-border);
+    border-left: 3px solid var(--green);
+    border-radius: 3px;
+    padding: 1.2rem 1.4rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+
+  .post-body pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #b0f0c8;
+    line-height: 1.7;
+  }
+
+  .code-label {
+    position: absolute;
+    top: 0; right: 0;
+    font-size: 0.55rem;
+    background: var(--green);
+    color: var(--bg);
+    padding: 0.15rem 0.5rem;
+    border-radius: 0 2px 0 3px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .post-body code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--bg3);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+  }
+
+  .post-body pre code { background: none; border: none; padding: 0; color: #b0f0c8; }
+
+  /* Callout / note boxes */
+  .callout {
+    border: 1px solid var(--green-border);
+    border-left: 3px solid var(--green);
+    background: var(--green-muted);
+    padding: 1rem 1.2rem;
+    border-radius: 3px;
+    margin: 1.5rem 0;
+    font-size: 0.75rem;
+    color: var(--gray);
+  }
+
+  .callout .callout-head {
+    color: var(--green);
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .callout-warn { border-left-color: var(--yellow); background: rgba(255,204,0,0.05); }
+  .callout-warn .callout-head { color: var(--yellow); }
+
+  .callout-red { border-left-color: var(--red); background: rgba(255,85,85,0.05); }
+  .callout-red .callout-head { color: var(--red); }
+
+  /* Table */
+  .post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.72rem;
+  }
+
+  .post-body th {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg3);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.62rem;
+  }
+
+  .post-body td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--green-border);
+    color: var(--gray);
+    background: var(--bg2);
+  }
+
+  .post-body tr:hover td { background: var(--green-muted); color: var(--white); }
+
+  /* Inline image */
+  .post-body figure {
+    margin: 2rem 0;
+    border: 1px solid var(--green-border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg3);
+  }
+
+  .post-body figure img {
+    width: 100%;
+    display: block;
+    opacity: 0.8;
+  }
+
+  .post-body figcaption {
+    font-size: 0.62rem;
+    color: var(--gray2);
+    padding: 0.5rem 0.8rem;
+    border-top: 1px solid var(--green-border);
+    text-align: center;
+  }
+
+  /* Post divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--green-border);
+    margin: 2.5rem 0;
+  }
+
+  /* === POST FOOTER === */
+  .post-footer-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 3rem;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .nav-post {
+    border: 1px solid var(--green-border);
+    background: var(--bg2);
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .nav-post:hover { border-color: var(--green); }
+  .nav-post .dir { font-size: 0.6rem; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .nav-post .nav-title { font-size: 0.75rem; color: var(--white); line-height: 1.4; }
+  .nav-post.next { text-align: right; }
+
+  /* === SIDEBAR === */
+  .sidebar { position: sticky; top: 76px; }
+
+  .sidebar-block {
+    border: 1px solid var(--green-border);
+    background: var(--bg2);
+    border-radius: 4px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .sidebar-title {
+    font-size: 0.6rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--green-border);
+  }
+
+  /* Table of Contents */
+  .toc-list { list-style: none; }
+  .toc-list li { margin-bottom: 0.4rem; }
+  .toc-list a {
+    font-size: 0.68rem;
+    color: var(--gray);
+    text-decoration: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    line-height: 1.5;
+    transition: color 0.2s;
+  }
+  .toc-list a::before { content: '//'; color: var(--green-border); flex-shrink: 0; font-size: 0.6rem; margin-top: 0.05rem; }
+  .toc-list a:hover { color: var(--green); }
+  .toc-list a.active { color: var(--green); }
+  .toc-list a.active::before { color: var(--green); }
+
+  /* Related posts */
+  .related-post {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .related-post:last-child { margin-bottom: 0; }
+
+  .related-img {
+    width: 52px; height: 40px;
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg3);
+    border: 1px solid var(--green-border);
+  }
+  .related-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+
+  .related-info .rtitle {
+    font-size: 0.66rem;
+    color: var(--gray);
+    line-height: 1.4;
+    transition: color 0.2s;
+  }
+  .related-post:hover .rtitle { color: var(--green); }
+  .related-info .rdate { font-size: 0.58rem; color: var(--gray2); margin-top: 0.2rem; }
+
+  /* Share */
+  .share-links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .share-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--green-border);
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .share-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-muted); }
+
+  /* Author card */
+  .author-card {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--green-muted), var(--bg3));
+    border: 1px solid var(--green-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--green);
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .author-name { font-size: 0.72rem; color: var(--white); margin-bottom: 0.2rem; }
+  .author-handle { font-size: 0.62rem; color: var(--green); }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--green-border);
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: 0.65rem;
+    color: var(--gray2);
+  }
+
+  .footer-copy { display: flex; align-items: center; gap: 0.5rem; }
+  .footer-copy .bracket { color: var(--green); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: var(--gray2); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--green); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Syntax highlight colors */
+  .kw { color: #ff79c6; }
+  .fn { color: #50fa7b; }
+  .str { color: #f1fa8c; }
+  .cm { color: #6272a4; font-style: italic; }
+  .var { color: #8be9fd; }
+  .num { color: #bd93f9; }
+</style>
+</head>
+<body>
+
+<div class="read-progress" id="readProgress"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="blog.html">ghost<span>wirez</span></a>
+  <div class="nav-links">
+    <a href="blog.html">Home</a>
+    <a href="blog.html" class="active">Blog</a>
+    <a href="blog.html">Tools</a>
+    <a href="blog.html">About</a>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>sys online</span>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="wrapper">
+
+  <!-- ARTICLE -->
+  <main>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="blog.html">~/blog</a>
+      <span class="sep">/</span>
+      <span>anti-forensics</span>
+      <span class="sep">/</span>
+      <span style="color:var(--gray)">file-timestamp-manipulation</span>
+    </div>
+
+    <!-- Header -->
+    <header class="post-header">
+      <div class="post-tags">
+        <span class="tag">Anti-Forensics</span>
+        <span class="tag tag-alt">Timestamp Manipulation</span>
+        <span class="tag tag-alt">DFIR</span>
+        <span class="tag tag-alt">Windows</span>
+      </div>
+
+      <h1 class="post-title">Anti-Forensics 101: File Timestamp Manipulation</h1>
+
+      <div class="post-meta">
+        <div class="meta-item"><span class="dot">></span> Mar 6, 2026</div>
+        <div class="meta-item"><span class="dot">></span> 6 min read</div>
+        <div class="meta-item"><span class="dot">></span> <span style="color:var(--green)">ghostwirez</span></div>
+        <div class="meta-item"><span class="dot">></span> NTFS · Windows · Linux</div>
+      </div>
+    </header>
+
+    <!-- Cover Image -->
+    <div class="cover-wrap">
+      <img src="https://pbs.twimg.com/media/HCLAt8kbMAAG95h?format=jpg" alt="Timestamp Manipulation"/>
+      <div class="cover-overlay"></div>
+    </div>
+
+    <!-- Body -->
+    <article class="post-body" id="postBody">
+
+      <p>Timestamps are metadata — small pieces of information the operating system attaches to a file to record when it was created, last opened, or modified. They look authoritative. If a file says it was created in 2019, investigators assume it must have existed in 2019.</p>
+
+      <p>They're wrong. And those timestamps are incredibly easy to change.</p>
+
+      <div class="callout">
+        <div class="callout-head">// note</div>
+        This post is for educational and defensive awareness purposes. Understanding how timestamp manipulation works is essential for both forensic examiners (detecting it) and red teamers (understanding detection surfaces).
+      </div>
+
+      <h2 id="what-is">What a Timestamp Actually Is</h2>
+
+      <p>On Windows systems using NTFS — still the dominant filesystem in enterprise environments — a file doesn't have just one timestamp. It has <strong>two separate sets stored in the Master File Table (MFT)</strong>, and they work in very different ways.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>Visible in Explorer?</th>
+            <th>Can user modify?</th>
+            <th>Updated by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>$STANDARD_INFORMATION</code> ($SI)</td>
+            <td>Yes</td>
+            <td>Yes — no admin needed</td>
+            <td>Userspace API calls</td>
+          </tr>
+          <tr>
+            <td><code>$FILE_NAME</code> ($FN)</td>
+            <td>No</td>
+            <td>Requires kernel access</td>
+            <td>Windows kernel only</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>This is the <strong>first major trap</strong> for attackers: if a tool only changes <code>$SI</code> timestamps, it creates a detectable inconsistency. The <code>$SI</code> might say a file was created in 2019, while <code>$FN</code> shows it was created last Tuesday.</p>
+
+      <div class="callout callout-warn">
+        <div class="callout-head">// forensic flag</div>
+        A mismatch between $SI and $FN is one of the highest-confidence indicators of timestamp tampering. Tools like Autopsy, Plaso, and commercial DFIR suites highlight this automatically.
+      </div>
+
+      <h2 id="toolbox">The Toolbox</h2>
+
+      <h3>Windows — Metasploit Timestomp</h3>
+
+      <p>The most commonly referenced tool. Modifies <code>$SI</code> attributes cleanly and can strip nanosecond precision. Default behavior does <em>not</em> touch <code>$FN</code> — a significant detection gap for skilled examiners.</p>
+
+      <pre><code><span class="cm"># Inside a Meterpreter session</span>
+<span class="fn">meterpreter</span> &gt; timestomp <span class="str">C:\\Windows\\Temp\\payload.exe</span> <span class="kw">-z</span> <span class="str">"01/01/2020 08:00:00"</span>
+<span class="fn">meterpreter</span> &gt; timestomp <span class="str">C:\\Windows\\Temp\\payload.exe</span> <span class="kw">-r</span>  <span class="cm"># randomize</span></code><div class="code-label">bash</div></pre>
+
+      <h3>Windows — SetMace (Double Timestomping)</h3>
+
+      <p><a href="https://github.com/jschicht/SetMace" target="_blank" rel="noopener">SetMace</a> by jschicht addresses the $FN gap. It can modify both <code>$SI</code> and <code>$FN</code> attributes — a process known as <strong>double timestomping</strong>. Still not undetectable (USN journal, $LogFile, prefetch), but covers the obvious layer.</p>
+
+      <h3>Windows — PowerShell (Native, No Binaries)</h3>
+
+      <p>The quietest approach for simple cases — use what's already on the machine:</p>
+
+      <pre><code><span class="cm"># Modify all three visible timestamps</span>
+<span class="var">$f</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Users\Public\payload.exe"</span>
+<span class="var">$f</span>.CreationTime     = <span class="str">"01/01/2020 08:00:00"</span>
+<span class="var">$f</span>.LastWriteTime    = <span class="str">"01/01/2020 08:00:00"</span>
+<span class="var">$f</span>.LastAccessTime   = <span class="str">"01/01/2020 08:00:00"</span>
+
+<span class="cm"># Or copy timestamps from a legitimate system file</span>
+<span class="var">$src</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Windows\System32\notepad.exe"</span>
+<span class="var">$tgt</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Users\Public\payload.exe"</span>
+<span class="var">$tgt</span>.CreationTime  = <span class="var">$src</span>.CreationTime
+<span class="var">$tgt</span>.LastWriteTime = <span class="var">$src</span>.LastWriteTime</code><div class="code-label">powershell</div></pre>
+
+      <p>Operates at the Win32 API layer, so only <code>$SI</code> is modified. No external binary required — useful when dropping additional tooling is a risk.</p>
+
+      <h3>Linux — touch</h3>
+
+      <p>Linux ext4 timestamps: <code>atime</code>, <code>mtime</code>, <code>ctime</code>, and on newer kernels, <code>crtime</code> (birth time).</p>
+
+      <pre><code><span class="cm"># Set access and modification times explicitly</span>
+<span class="fn">touch</span> <span class="kw">-a</span> <span class="kw">-m</span> <span class="kw">-t</span> <span class="num">202001011200.00</span> maliciousfile
+
+<span class="cm"># Copy timestamps from a legitimate native file (blend in)</span>
+<span class="fn">touch</span> <span class="kw">-r</span> /usr/bin/curl maliciousfile</code><div class="code-label">bash</div></pre>
+
+      <p>The second form — cloning from a legitimate binary — is particularly effective. Instead of a suspicious fixed date, the file inherits the timestamp profile of a trusted native tool. <strong>Ctime cannot be directly modified via userspace</strong>. It updates whenever metadata changes, including when <code>touch</code> runs. This makes it a frequent tell on Linux systems.</p>
+
+      <h3>Cross-Platform — Python</h3>
+
+      <pre><code><span class="kw">import</span> <span class="var">os</span>, <span class="var">time</span>
+
+<span class="var">ts</span> = <span class="fn">time.mktime</span>(<span class="fn">time.strptime</span>(<span class="str">"2020-01-01 12:00:00"</span>, <span class="str">"%Y-%m-%d %H:%M:%S"</span>))
+<span class="fn">os.utime</span>(<span class="str">"/path/to/file"</span>, (<span class="var">ts</span>, <span class="var">ts</span>))  <span class="cm"># (atime, mtime)</span></code><div class="code-label">python</div></pre>
+
+      <p>Three lines. Works anywhere Python is installed. The same ctime limitation from Linux applies, but for quick operations where deep forensic analysis is unlikely, this is sufficient.</p>
+
+      <h2 id="nanoseconds">The Nanosecond Problem</h2>
+
+      <p>Windows NTFS stores timestamps with <strong>100-nanosecond resolution</strong>. Real files almost never have perfectly rounded sub-second values. Most basic timestomping tools — including older Metasploit versions — zero out the nanosecond component.</p>
+
+      <div class="callout callout-red">
+        <div class="callout-head">// detection surface</div>
+        A directory of thousands of files where one has a perfectly zeroed sub-second timestamp is trivially detectable by any examiner worth their rate. Use <code>nTimetools</code> (limbenjamin/nTimetools on GitHub) to randomize nanosecond values.
+      </div>
+
+      <pre><code><span class="cm"># nTimestomp — set nanosecond-precision timestamps</span>
+<span class="fn">nTimestomp.exe</span> <span class="kw">-f</span> <span class="str">C:\payload.exe</span> <span class="kw">-c</span> <span class="str">"2020-01-01 08:15:33.847291200"</span></code><div class="code-label">cmd</div></pre>
+
+      <h2 id="counterintuitive">The Counterintuitive Insight</h2>
+
+      <p>Here's what most guides miss: <strong>clumsy timestomping makes analysis easier, not harder.</strong></p>
+
+      <p>The MFT assigns sequence numbers in order of file allocation. A file showing a creation date of 2019 but holding an MFT sequence number wedged between files from last Thursday is an immediate contradiction — one no timestamp change can hide. The sequence reveals allocation order, not the claimed date.</p>
+
+      <p>Other corroborating sources that don't care about your timestamps:</p>
+
+      <table>
+        <thead>
+          <tr><th>Artifact</th><th>What it records</th><th>Affected by timestomping?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>MFT sequence number</td><td>Allocation order</td><td>No</td></tr>
+          <tr><td>USN Journal / $LogFile</td><td>Filesystem activity log</td><td>No</td></tr>
+          <tr><td>Prefetch files</td><td>Execution timestamps</td><td>No</td></tr>
+          <tr><td>Windows Event Logs</td><td>Process creation, etc.</td><td>No</td></tr>
+          <tr><td>Shimcache / Amcache</td><td>Execution history</td><td>No</td></tr>
+          <tr><td>$FN attribute</td><td>Kernel-level timestamps</td><td>Only via SetMace</td></tr>
+        </tbody>
+      </table>
+
+      <p>Changing one layer while leaving the others untouched doesn't hide the file — it makes it stand out. Coherent manipulation across all evidence sources is extremely difficult and rarely seen outside of sophisticated, nation-state-level operations.</p>
+
+      <h2 id="takeaway">The Real Lesson</h2>
+
+      <p>Timestamp manipulation exploits a cognitive bias: humans trust metadata more than they should. When we see <em>Created: January 1, 2020</em>, we instinctively classify the file as old, familiar, unrelated to the incident.</p>
+
+      <p><strong>The best anti-forensics doesn't erase evidence. It creates evidence that appears believable.</strong> The best forensic work doesn't just look for evidence — it checks consistency across all evidence sources simultaneously.</p>
+
+      <p>Anyone can change a timestamp. Very few can change everything that remembers it.</p>
+
+      <hr class="divider"/>
+
+      <div class="callout">
+        <div class="callout-head">// defensive notes</div>
+        For blue teamers: enable <code>$UsnJrnl</code> on critical volumes, forward Windows Event Log 4663 (object access) to your SIEM, and baseline your most sensitive directories for $FN vs $SI discrepancies using tools like <strong>MFTECmd</strong> or <strong>Autopsy</strong>. Scheduled Shimcache exports also give you a longitudinal view of execution that timestamps can't touch.
+      </div>
+
+    </article>
+
+    <!-- Post nav -->
+    <div class="post-footer-nav">
+      <a class="nav-post" href="#">
+        <div class="dir">← previous</div>
+        <div class="nav-title">Social Graph Reconstruction</div>
+      </a>
+      <a class="nav-post next" href="#">
+        <div class="dir">next →</div>
+        <div class="nav-title">Anti-Forensics 101: Data Wiping</div>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Author -->
+    <div class="sidebar-block">
+      <div class="sidebar-title">// author</div>
+      <div class="author-card">
+        <div class="author-avatar">GW</div>
+        <div>
+          <div class="author-name">ghostwirez</div>
+          <div class="author-handle">@sec_alegaspi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ToC -->
+    <div class="sidebar-block">
+      <div class="sidebar-title">// contents</div>
+      <ul class="toc-list" id="toc">
+        <li><a href="#what-is" class="active">What a Timestamp Actually Is</a></li>
+        <li><a href="#toolbox">The Toolbox</a></li>
+        <li><a href="#nanoseconds">The Nanosecond Problem</a></li>
+        <li><a href="#counterintuitive">The Counterintuitive Insight</a></li>
+        <li><a href="#takeaway">The Real Lesson</a></li>
+      </ul>
+    </div>
+
+    <!-- Share -->
+    <div class="sidebar-block">
+      <div class="sidebar-title">// share</div>
+      <div class="share-links">
+        <a class="share-btn" href="https://x.com/intent/tweet?text=Anti-Forensics+101%3A+File+Timestamp+Manipulation&url=" target="_blank">Twitter/X</a>
+        <button class="share-btn" onclick="copyLink()">Copy Link</button>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <div class="sidebar-block">
+      <div class="sidebar-title">// related posts</div>
+
+      <a class="related-post" href="#">
+        <div class="related-img"><img src="https://pbs.twimg.com/media/HCF6nlfX0AA5XAN?format=jpg" alt=""/></div>
+        <div class="related-info">
+          <div class="rtitle">Anti-Forensics 101: Data Wiping</div>
+          <div class="rdate">Feb 26, 2026 · 4 min</div>
+        </div>
+      </a>
+
+      <a class="related-post" href="#">
+        <div class="related-img"><img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/0*lQDgQbOTWjJbnYLg.jpg" alt=""/></div>
+        <div class="related-info">
+          <div class="rtitle">Hijacking Windows with Only Built-in Tools</div>
+          <div class="rdate">Jun 13, 2025 · 9 min</div>
+        </div>
+      </a>
+
+      <a class="related-post" href="#">
+        <div class="related-img"><img src="https://pbs.twimg.com/media/GuI9LBeWcAAW_Tr?format=png&name=medium" alt=""/></div>
+        <div class="related-info">
+          <div class="rtitle">FileFix: PowerShell via File Explorer</div>
+          <div class="rdate">Jun 25, 2025 · 3 min</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Tags -->
+    <div class="sidebar-block">
+      <div class="sidebar-title">// tags</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem">
+        <span class="tag" style="cursor:default">NTFS</span>
+        <span class="tag tag-alt" style="cursor:default">Windows</span>
+        <span class="tag tag-alt" style="cursor:default">Linux</span>
+        <span class="tag tag-alt" style="cursor:default">MFT</span>
+        <span class="tag tag-alt" style="cursor:default">DFIR</span>
+        <span class="tag tag-alt" style="cursor:default">Timestomp</span>
+        <span class="tag tag-alt" style="cursor:default">Anti-Forensics</span>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">
+    <span class="bracket">[</span>
+    <span>© 2026 ghostwirez</span>
+    <span class="bracket">]</span>
+  </div>
+  <div class="footer-links">
+    <a href="blog.html">← Back to Blog</a>
+    <a href="https://github.com/t3chfalcon" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</footer>
+
+<script>
+// Reading progress bar
+const progress = document.getElementById('readProgress');
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrollTop = doc.scrollTop || document.body.scrollTop;
+  const scrollHeight = doc.scrollHeight - doc.clientHeight;
+  const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+  progress.style.width = pct + '%';
+});
+
+// TOC active state
+const headings = document.querySelectorAll('.post-body h2');
+const tocLinks = document.querySelectorAll('.toc-list a');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector('.toc-list a[href="#' + entry.target.id + '"]');
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+headings.forEach(h => observer.observe(h));
+
+// Copy link
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
