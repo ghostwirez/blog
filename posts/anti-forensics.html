@@ -7,6 +7,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 
+
   :root {
     --bg: #050505;
     --bg2: #0a0a0a;
@@ -503,7 +504,16 @@
   .cm { color: #6272a4; font-style: italic; }
   .var { color: #8be9fd; }
   .num { color: #bd93f9; }
+
+  /* Markdown callout syntax support */
+  .md-callout { border: 1px solid var(--green-border); border-left: 3px solid var(--green); background: var(--green-muted); padding: 1rem 1.2rem; border-radius: 3px; margin: 1.5rem 0; font-size: 0.75rem; color: var(--gray); }
+  .md-callout-head { color: var(--green); font-weight: 600; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .md-callout-warn { border-left-color: var(--yellow); background: rgba(255,204,0,0.05); }
+  .md-callout-warn .md-callout-head { color: var(--yellow); }
+  .md-callout-red { border-left-color: var(--red); background: rgba(255,85,85,0.05); }
+  .md-callout-red .md-callout-head { color: var(--red); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </head>
 <body>
 
@@ -565,158 +575,185 @@
     </div>
 
     <!-- Body -->
-    <article class="post-body" id="postBody">
+    <article class="post-body" id="postBody"></article>
 
-      <p>Timestamps are metadata — small pieces of information the operating system attaches to a file to record when it was created, last opened, or modified. They look authoritative. If a file says it was created in 2019, investigators assume it must have existed in 2019.</p>
+    <!-- ============================================================
+         POST CONTENT — Edit the markdown below to update the post.
 
-      <p>They're wrong. And those timestamps are incredibly easy to change.</p>
+         SUPPORTED ELEMENTS:
+           ## Heading 2        → section heading (green, with border)
+           ### Heading 3       → subheading (white)
+           **bold**            → white bold
+           *italic*            → cyan accent (no italic style)
+           `inline code`       → green inline code
+           [text](url)         → links
+           Tables              → standard markdown table syntax
 
-      <div class="callout">
-        <div class="callout-head">// note</div>
-        This post is for educational and defensive awareness purposes. Understanding how timestamp manipulation works is essential for both forensic examiners (detecting it) and red teamers (understanding detection surfaces).
-      </div>
+         CODE BLOCKS:
+           Use triple backticks with a language tag:
+             ```bash
+             your code here
+             ```
 
-      <h2 id="what-is">What a Timestamp Actually Is</h2>
+         CALLOUT BOXES:
+           Three variants — wrap content with the markers below.
+           Each callout needs a label line starting with >>label<<
+           followed by the body text.
 
-      <p>On Windows systems using NTFS — still the dominant filesystem in enterprise environments — a file doesn't have just one timestamp. It has <strong>two separate sets stored in the Master File Table (MFT)</strong>, and they work in very different ways.</p>
+           [callout]
+           >>// note<<
+           Your note text here.
+           [/callout]
 
-      <table>
-        <thead>
-          <tr>
-            <th>Attribute</th>
-            <th>Visible in Explorer?</th>
-            <th>Can user modify?</th>
-            <th>Updated by</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>$STANDARD_INFORMATION</code> ($SI)</td>
-            <td>Yes</td>
-            <td>Yes — no admin needed</td>
-            <td>Userspace API calls</td>
-          </tr>
-          <tr>
-            <td><code>$FILE_NAME</code> ($FN)</td>
-            <td>No</td>
-            <td>Requires kernel access</td>
-            <td>Windows kernel only</td>
-          </tr>
-        </tbody>
-      </table>
+           [callout-warn]
+           >>// warning<<
+           Your warning text here.
+           [/callout-warn]
 
-      <p>This is the <strong>first major trap</strong> for attackers: if a tool only changes <code>$SI</code> timestamps, it creates a detectable inconsistency. The <code>$SI</code> might say a file was created in 2019, while <code>$FN</code> shows it was created last Tuesday.</p>
+           [callout-red]
+           >>// detection surface<<
+           Your alert text here.
+           [/callout-red]
 
-      <div class="callout callout-warn">
-        <div class="callout-head">// forensic flag</div>
-        A mismatch between $SI and $FN is one of the highest-confidence indicators of timestamp tampering. Tools like Autopsy, Plaso, and commercial DFIR suites highlight this automatically.
-      </div>
+         DIVIDER:
+           ---              → horizontal rule (styled)
 
-      <h2 id="toolbox">The Toolbox</h2>
+    ============================================================ -->
+    <script id="postMarkdown" type="text/markdown">
+Timestamps are metadata — small pieces of information the operating system attaches to a file to record when it was created, last opened, or modified. They look authoritative. If a file says it was created in 2019, investigators assume it must have existed in 2019.
 
-      <h3>Windows — Metasploit Timestomp</h3>
+They're wrong. And those timestamps are incredibly easy to change.
 
-      <p>The most commonly referenced tool. Modifies <code>$SI</code> attributes cleanly and can strip nanosecond precision. Default behavior does <em>not</em> touch <code>$FN</code> — a significant detection gap for skilled examiners.</p>
+[callout]
+>>// note<<
+This post is for educational and defensive awareness purposes. Understanding how timestamp manipulation works is essential for both forensic examiners (detecting it) and red teamers (understanding detection surfaces).
+[/callout]
 
-      <pre><code><span class="cm"># Inside a Meterpreter session</span>
-<span class="fn">meterpreter</span> &gt; timestomp <span class="str">C:\\Windows\\Temp\\payload.exe</span> <span class="kw">-z</span> <span class="str">"01/01/2020 08:00:00"</span>
-<span class="fn">meterpreter</span> &gt; timestomp <span class="str">C:\\Windows\\Temp\\payload.exe</span> <span class="kw">-r</span>  <span class="cm"># randomize</span></code><div class="code-label">bash</div></pre>
+## What a Timestamp Actually Is {#what-is}
 
-      <h3>Windows — SetMace (Double Timestomping)</h3>
+On Windows systems using NTFS — still the dominant filesystem in enterprise environments — a file doesn't have just one timestamp. It has **two separate sets stored in the Master File Table (MFT)**, and they work in very different ways.
 
-      <p><a href="https://github.com/jschicht/SetMace" target="_blank" rel="noopener">SetMace</a> by jschicht addresses the $FN gap. It can modify both <code>$SI</code> and <code>$FN</code> attributes — a process known as <strong>double timestomping</strong>. Still not undetectable (USN journal, $LogFile, prefetch), but covers the obvious layer.</p>
+| Attribute | Visible in Explorer? | Can user modify? | Updated by |
+|---|---|---|---|
+| `$STANDARD_INFORMATION` ($SI) | Yes | Yes — no admin needed | Userspace API calls |
+| `$FILE_NAME` ($FN) | No | Requires kernel access | Windows kernel only |
 
-      <h3>Windows — PowerShell (Native, No Binaries)</h3>
+This is the **first major trap** for attackers: if a tool only changes `$SI` timestamps, it creates a detectable inconsistency. The `$SI` might say a file was created in 2019, while `$FN` shows it was created last Tuesday.
 
-      <p>The quietest approach for simple cases — use what's already on the machine:</p>
+[callout-warn]
+>>// forensic flag<<
+A mismatch between $SI and $FN is one of the highest-confidence indicators of timestamp tampering. Tools like Autopsy, Plaso, and commercial DFIR suites highlight this automatically.
+[/callout-warn]
 
-      <pre><code><span class="cm"># Modify all three visible timestamps</span>
-<span class="var">$f</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Users\Public\payload.exe"</span>
-<span class="var">$f</span>.CreationTime     = <span class="str">"01/01/2020 08:00:00"</span>
-<span class="var">$f</span>.LastWriteTime    = <span class="str">"01/01/2020 08:00:00"</span>
-<span class="var">$f</span>.LastAccessTime   = <span class="str">"01/01/2020 08:00:00"</span>
+## The Toolbox {#toolbox}
 
-<span class="cm"># Or copy timestamps from a legitimate system file</span>
-<span class="var">$src</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Windows\System32\notepad.exe"</span>
-<span class="var">$tgt</span> = <span class="fn">Get-Item</span> <span class="str">"C:\Users\Public\payload.exe"</span>
-<span class="var">$tgt</span>.CreationTime  = <span class="var">$src</span>.CreationTime
-<span class="var">$tgt</span>.LastWriteTime = <span class="var">$src</span>.LastWriteTime</code><div class="code-label">powershell</div></pre>
+### Windows — Metasploit Timestomp
 
-      <p>Operates at the Win32 API layer, so only <code>$SI</code> is modified. No external binary required — useful when dropping additional tooling is a risk.</p>
+The most commonly referenced tool. Modifies `$SI` attributes cleanly and can strip nanosecond precision. Default behavior does *not* touch `$FN` — a significant detection gap for skilled examiners.
 
-      <h3>Linux — touch</h3>
+```bash
+# Inside a Meterpreter session
+meterpreter > timestomp C:\\Windows\\Temp\\payload.exe -z "01/01/2020 08:00:00"
+meterpreter > timestomp C:\\Windows\\Temp\\payload.exe -r  # randomize
+```
 
-      <p>Linux ext4 timestamps: <code>atime</code>, <code>mtime</code>, <code>ctime</code>, and on newer kernels, <code>crtime</code> (birth time).</p>
+### Windows — SetMace (Double Timestomping)
 
-      <pre><code><span class="cm"># Set access and modification times explicitly</span>
-<span class="fn">touch</span> <span class="kw">-a</span> <span class="kw">-m</span> <span class="kw">-t</span> <span class="num">202001011200.00</span> maliciousfile
+[SetMace](https://github.com/jschicht/SetMace) by jschicht addresses the $FN gap. It can modify both `$SI` and `$FN` attributes — a process known as **double timestomping**. Still not undetectable (USN journal, $LogFile, prefetch), but covers the obvious layer.
 
-<span class="cm"># Copy timestamps from a legitimate native file (blend in)</span>
-<span class="fn">touch</span> <span class="kw">-r</span> /usr/bin/curl maliciousfile</code><div class="code-label">bash</div></pre>
+### Windows — PowerShell (Native, No Binaries)
 
-      <p>The second form — cloning from a legitimate binary — is particularly effective. Instead of a suspicious fixed date, the file inherits the timestamp profile of a trusted native tool. <strong>Ctime cannot be directly modified via userspace</strong>. It updates whenever metadata changes, including when <code>touch</code> runs. This makes it a frequent tell on Linux systems.</p>
+The quietest approach for simple cases — use what's already on the machine:
 
-      <h3>Cross-Platform — Python</h3>
+```powershell
+# Modify all three visible timestamps
+$f = Get-Item "C:\Users\Public\payload.exe"
+$f.CreationTime     = "01/01/2020 08:00:00"
+$f.LastWriteTime    = "01/01/2020 08:00:00"
+$f.LastAccessTime   = "01/01/2020 08:00:00"
 
-      <pre><code><span class="kw">import</span> <span class="var">os</span>, <span class="var">time</span>
+# Or copy timestamps from a legitimate system file
+$src = Get-Item "C:\Windows\System32\notepad.exe"
+$tgt = Get-Item "C:\Users\Public\payload.exe"
+$tgt.CreationTime  = $src.CreationTime
+$tgt.LastWriteTime = $src.LastWriteTime
+```
 
-<span class="var">ts</span> = <span class="fn">time.mktime</span>(<span class="fn">time.strptime</span>(<span class="str">"2020-01-01 12:00:00"</span>, <span class="str">"%Y-%m-%d %H:%M:%S"</span>))
-<span class="fn">os.utime</span>(<span class="str">"/path/to/file"</span>, (<span class="var">ts</span>, <span class="var">ts</span>))  <span class="cm"># (atime, mtime)</span></code><div class="code-label">python</div></pre>
+Operates at the Win32 API layer, so only `$SI` is modified. No external binary required — useful when dropping additional tooling is a risk.
 
-      <p>Three lines. Works anywhere Python is installed. The same ctime limitation from Linux applies, but for quick operations where deep forensic analysis is unlikely, this is sufficient.</p>
+### Linux — touch
 
-      <h2 id="nanoseconds">The Nanosecond Problem</h2>
+Linux ext4 timestamps: `atime`, `mtime`, `ctime`, and on newer kernels, `crtime` (birth time).
 
-      <p>Windows NTFS stores timestamps with <strong>100-nanosecond resolution</strong>. Real files almost never have perfectly rounded sub-second values. Most basic timestomping tools — including older Metasploit versions — zero out the nanosecond component.</p>
+```bash
+# Set access and modification times explicitly
+touch -a -m -t 202001011200.00 maliciousfile
 
-      <div class="callout callout-red">
-        <div class="callout-head">// detection surface</div>
-        A directory of thousands of files where one has a perfectly zeroed sub-second timestamp is trivially detectable by any examiner worth their rate. Use <code>nTimetools</code> (limbenjamin/nTimetools on GitHub) to randomize nanosecond values.
-      </div>
+# Copy timestamps from a legitimate native file (blend in)
+touch -r /usr/bin/curl maliciousfile
+```
 
-      <pre><code><span class="cm"># nTimestomp — set nanosecond-precision timestamps</span>
-<span class="fn">nTimestomp.exe</span> <span class="kw">-f</span> <span class="str">C:\payload.exe</span> <span class="kw">-c</span> <span class="str">"2020-01-01 08:15:33.847291200"</span></code><div class="code-label">cmd</div></pre>
+The second form — cloning from a legitimate binary — is particularly effective. Instead of a suspicious fixed date, the file inherits the timestamp profile of a trusted native tool. **Ctime cannot be directly modified via userspace**. It updates whenever metadata changes, including when `touch` runs. This makes it a frequent tell on Linux systems.
 
-      <h2 id="counterintuitive">The Counterintuitive Insight</h2>
+### Cross-Platform — Python
 
-      <p>Here's what most guides miss: <strong>clumsy timestomping makes analysis easier, not harder.</strong></p>
+```python
+import os, time
 
-      <p>The MFT assigns sequence numbers in order of file allocation. A file showing a creation date of 2019 but holding an MFT sequence number wedged between files from last Thursday is an immediate contradiction — one no timestamp change can hide. The sequence reveals allocation order, not the claimed date.</p>
+ts = time.mktime(time.strptime("2020-01-01 12:00:00", "%Y-%m-%d %H:%M:%S"))
+os.utime("/path/to/file", (ts, ts))  # (atime, mtime)
+```
 
-      <p>Other corroborating sources that don't care about your timestamps:</p>
+Three lines. Works anywhere Python is installed. The same ctime limitation from Linux applies, but for quick operations where deep forensic analysis is unlikely, this is sufficient.
 
-      <table>
-        <thead>
-          <tr><th>Artifact</th><th>What it records</th><th>Affected by timestomping?</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>MFT sequence number</td><td>Allocation order</td><td>No</td></tr>
-          <tr><td>USN Journal / $LogFile</td><td>Filesystem activity log</td><td>No</td></tr>
-          <tr><td>Prefetch files</td><td>Execution timestamps</td><td>No</td></tr>
-          <tr><td>Windows Event Logs</td><td>Process creation, etc.</td><td>No</td></tr>
-          <tr><td>Shimcache / Amcache</td><td>Execution history</td><td>No</td></tr>
-          <tr><td>$FN attribute</td><td>Kernel-level timestamps</td><td>Only via SetMace</td></tr>
-        </tbody>
-      </table>
+## The Nanosecond Problem {#nanoseconds}
 
-      <p>Changing one layer while leaving the others untouched doesn't hide the file — it makes it stand out. Coherent manipulation across all evidence sources is extremely difficult and rarely seen outside of sophisticated, nation-state-level operations.</p>
+Windows NTFS stores timestamps with **100-nanosecond resolution**. Real files almost never have perfectly rounded sub-second values. Most basic timestomping tools — including older Metasploit versions — zero out the nanosecond component.
 
-      <h2 id="takeaway">The Real Lesson</h2>
+[callout-red]
+>>// detection surface<<
+A directory of thousands of files where one has a perfectly zeroed sub-second timestamp is trivially detectable by any examiner worth their rate. Use `nTimetools` (limbenjamin/nTimetools on GitHub) to randomize nanosecond values.
+[/callout-red]
 
-      <p>Timestamp manipulation exploits a cognitive bias: humans trust metadata more than they should. When we see <em>Created: January 1, 2020</em>, we instinctively classify the file as old, familiar, unrelated to the incident.</p>
+```cmd
+# nTimestomp — set nanosecond-precision timestamps
+nTimestomp.exe -f C:\payload.exe -c "2020-01-01 08:15:33.847291200"
+```
 
-      <p><strong>The best anti-forensics doesn't erase evidence. It creates evidence that appears believable.</strong> The best forensic work doesn't just look for evidence — it checks consistency across all evidence sources simultaneously.</p>
+## The Counterintuitive Insight {#counterintuitive}
 
-      <p>Anyone can change a timestamp. Very few can change everything that remembers it.</p>
+Here's what most guides miss: **clumsy timestomping makes analysis easier, not harder.**
 
-      <hr class="divider"/>
+The MFT assigns sequence numbers in order of file allocation. A file showing a creation date of 2019 but holding an MFT sequence number wedged between files from last Thursday is an immediate contradiction — one no timestamp change can hide. The sequence reveals allocation order, not the claimed date.
 
-      <div class="callout">
-        <div class="callout-head">// defensive notes</div>
-        For blue teamers: enable <code>$UsnJrnl</code> on critical volumes, forward Windows Event Log 4663 (object access) to your SIEM, and baseline your most sensitive directories for $FN vs $SI discrepancies using tools like <strong>MFTECmd</strong> or <strong>Autopsy</strong>. Scheduled Shimcache exports also give you a longitudinal view of execution that timestamps can't touch.
-      </div>
+Other corroborating sources that don't care about your timestamps:
 
-    </article>
+| Artifact | What it records | Affected by timestomping? |
+|---|---|---|
+| MFT sequence number | Allocation order | No |
+| USN Journal / $LogFile | Filesystem activity log | No |
+| Prefetch files | Execution timestamps | No |
+| Windows Event Logs | Process creation, etc. | No |
+| Shimcache / Amcache | Execution history | No |
+| $FN attribute | Kernel-level timestamps | Only via SetMace |
+
+Changing one layer while leaving the others untouched doesn't hide the file — it makes it stand out. Coherent manipulation across all evidence sources is extremely difficult and rarely seen outside of sophisticated, nation-state-level operations.
+
+## The Real Lesson {#takeaway}
+
+Timestamp manipulation exploits a cognitive bias: humans trust metadata more than they should. When we see *Created: January 1, 2020*, we instinctively classify the file as old, familiar, unrelated to the incident.
+
+**The best anti-forensics doesn't erase evidence. It creates evidence that appears believable.** The best forensic work doesn't just look for evidence — it checks consistency across all evidence sources simultaneously.
+
+Anyone can change a timestamp. Very few can change everything that remembers it.
+
+---
+
+[callout]
+>>// defensive notes<<
+For blue teamers: enable `$UsnJrnl` on critical volumes, forward Windows Event Log 4663 (object access) to your SIEM, and baseline your most sensitive directories for $FN vs $SI discrepancies using tools like **MFTECmd** or **Autopsy**. Scheduled Shimcache exports also give you a longitudinal view of execution that timestamps can't touch.
+[/callout]
+    </script>
 
     <!-- Post nav -->
     <div class="post-footer-nav">
@@ -829,31 +866,104 @@
 </footer>
 
 <script>
-// Reading progress bar
-const progress = document.getElementById('readProgress');
-window.addEventListener('scroll', () => {
-  const doc = document.documentElement;
-  const scrollTop = doc.scrollTop || document.body.scrollTop;
-  const scrollHeight = doc.scrollHeight - doc.clientHeight;
-  const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-  progress.style.width = pct + '%';
-});
+// ── Markdown renderer ─────────────────────────────────────────────────────────
+(function renderPost() {
+  const src = document.getElementById('postMarkdown');
+  const target = document.getElementById('postBody');
+  if (!src || !target || typeof marked === 'undefined') return;
 
-// TOC active state
-const headings = document.querySelectorAll('.post-body h2');
-const tocLinks = document.querySelectorAll('.toc-list a');
+  let md = src.textContent;
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      tocLinks.forEach(l => l.classList.remove('active'));
-      const active = document.querySelector('.toc-list a[href="#' + entry.target.id + '"]');
-      if (active) active.classList.add('active');
-    }
+  // Pre-process custom callout syntax before marked runs
+  // [callout], [callout-warn], [callout-red]
+  function processCallouts(text) {
+    const variants = ['callout-warn', 'callout-red', 'callout'];
+    variants.forEach(v => {
+      const open  = new RegExp('\\[' + v + '\\]\\s*', 'g');
+      const close = new RegExp('\\s*\\[\\/' + v + '\\]', 'g');
+      text = text.replace(open,  `\x00CALLOUT_START_${v}\x00`);
+      text = text.replace(close, `\x00CALLOUT_END\x00`);
+    });
+    return text;
+  }
+
+  md = processCallouts(md);
+
+  // Convert >>label<< lines to a placeholder so marked doesn't eat them
+  md = md.replace(/>>(.+?)<<\n/g, '\x00CALLOUT_LABEL\x00$1\x00\n');
+
+  // Add IDs to headings that have {#id} syntax
+  const renderer = new marked.Renderer();
+  renderer.heading = function(text, level) {
+    const idMatch = text.match(/\{#([^}]+)\}/);
+    const id = idMatch ? idMatch[1] : '';
+    const clean = text.replace(/\s*\{#[^}]+\}/, '');
+    const tag = 'h' + level;
+    return id
+      ? `<${tag} id="${id}">${clean}</${tag}>`
+      : `<${tag}>${clean}</${tag}>`;
+  };
+
+  // Style <hr> as .divider
+  renderer.hr = function() {
+    return '<hr class="divider"/>';
+  };
+
+  marked.setOptions({ renderer, breaks: true, gfm: true });
+
+  let html = marked.parse(md);
+
+  // Post-process: restore callout blocks
+  html = html.replace(/<p>\x00CALLOUT_START_([^<]+)\x00<\/p>/g, (_, v) => {
+    return `<div class="md-callout ${v === 'callout' ? '' : 'md-' + v}">`;
   });
-}, { rootMargin: '-20% 0px -70% 0px' });
+  html = html.replace(/<p>\x00CALLOUT_END\x00<\/p>/g, '</div>');
+  html = html.replace(/<p>\x00CALLOUT_LABEL\x00([^\x00]+)\x00\s*<\/p>/g, (_, label) => {
+    return `<div class="md-callout-head">${label}</div>`;
+  });
 
-headings.forEach(h => observer.observe(h));
+  // Also handle label inside a paragraph with following content
+  html = html.replace(/\x00CALLOUT_LABEL\x00([^\x00]+)\x00/g, (_, label) => {
+    return `<div class="md-callout-head">${label}</div>`;
+  });
+  html = html.replace(/\x00CALLOUT_START_([^\x00]+)\x00/g, (_, v) => {
+    return `<div class="md-callout ${v === 'callout' ? '' : 'md-' + v}">`;
+  });
+  html = html.replace(/\x00CALLOUT_END\x00/g, '</div>');
+
+  // Add language labels to code blocks (first word of class)
+  html = html.replace(/<pre><code class="language-([^"]+)">/g, (_, lang) => {
+    return `<pre><code class="language-${lang}"><div class="code-label">${lang}</div>`;
+  });
+
+  target.innerHTML = html;
+
+  // ── Reading progress bar ───────────────────────────────────────────────────
+  const progress = document.getElementById('readProgress');
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = doc.scrollHeight - doc.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    progress.style.width = pct + '%';
+  });
+
+  // ── TOC active state ───────────────────────────────────────────────────────
+  const headings = document.querySelectorAll('.post-body h2');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector('.toc-list a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  headings.forEach(h => observer.observe(h));
+})();
 
 // Copy link
 function copyLink() {
