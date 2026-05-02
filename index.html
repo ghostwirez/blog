@@ -988,47 +988,62 @@
 
       <div class="tool-card" style="animation-delay:0s">
         <div class="tool-header">
-          <div class="tool-name">Evasion &amp; Anti-Analysis Detector</div>
+          <div class="tool-name">USB-Powered Adapter with Built-In Executable File Filtering Software Against Malware Threats for USB Storage Devices</div>
           <span class="tool-badge">Python</span>
         </div>
-        <p class="tool-desc">Red-team focused PE analysis tool that detects evasion techniques, anti-analysis patterns, and suspicious characteristics in Windows executables. Detects direct syscall patterns, API hashing, RWX sections, reflective DLL loaders, AMSI bypass patterns, and ETW patching indicators with weighted risk scoring.</p>
+        <p class="tool-desc">Portable hardware-software security device that intercepts executable file transfers between USB storage devices and Windows hosts. Runs a Python file watcher on a Raspberry Pi Zero WH performing static PE structure analysis and MD5 hash matching against known malware signatures, quarantining flagged .exe files before they reach the host system.</p>
         <div class="tool-tags">
           <span class="tool-tag">PE Analysis</span>
-          <span class="tool-tag">Evasion Detection</span>
-          <span class="tool-tag">Anti-Analysis</span>
-          <span class="tool-tag">Risk Scoring</span>
+          <span class="tool-tag">Malware Analysis</span>
+          <span class="tool-tag">USB Security</span>
+          <span class="tool-tag">Embedded Security</span>
         </div>
-        <a class="tool-link" href="https://github.com/T3chfalcon/Evasion-Anti-Analysis-Detector" target="_blank" rel="noopener">GitHub →</a>
+        <a class="tool-link" href="https://github.com/ghostwirez/USB-Filter" target="_blank" rel="noopener">GitHub →</a>
       </div>
 
       <div class="tool-card" style="animation-delay:0.1s">
         <div class="tool-header">
-          <div class="tool-name">Loader Fingerprinting Tool</div>
+          <div class="tool-name">CVE-2024-9326 PoC - SQL Injection</div>
           <span class="tool-badge">Python</span>
         </div>
-        <p class="tool-desc">Static-analysis tradecraft classifier for Windows loaders. Analyzes PE files to identify execution models, injection intent, API resolution methods, payload styles, and evasion posture. Classifies how a binary plans to execute code and what execution philosophy the author uses.</p>
+        <p class="tool-desc">Python-based proof-of-concept exploit for CVE-2024-9326, a high-severity SQL injection vulnerability in PHPGurukul Online Shopping Portal v2.0. Automates authentication bypass via classic comment-sequence payload injection against the admin login endpoint, with configurable target URL, port, username payload, and password through a CLI interface, enabling security professionals to confirm exploitability during assessments.</p>
         <div class="tool-tags">
-          <span class="tool-tag">Static Analysis</span>
-          <span class="tool-tag">PE Analysis</span>
-          <span class="tool-tag">Loader Classification</span>
-          <span class="tool-tag">Tradecraft</span>
+          <span class="tool-tag">SQL Injection</span>
+          <span class="tool-tag">Exploit Development</span>
+          <span class="tool-tag">Web Security</span>
+          <span class="tool-tag">Penetration Testing</span>
         </div>
-        <a class="tool-link" href="https://github.com/T3chfalcon/Loader-Fingerprinting-Tool" target="_blank" rel="noopener">GitHub →</a>
+        <a class="tool-link" href="https://github.com/ghostwirez/CVE-2024-9326-PoC" target="_blank" rel="noopener">GitHub →</a>
       </div>
 
       <div class="tool-card" style="animation-delay:0.2s">
         <div class="tool-header">
-          <div class="tool-name">Malware Report Auto-Writer</div>
-          <span class="tool-badge">Python · Jinja</span>
+          <div class="tool-name">CVE-2024-39090 PoC - CSRF to Stored XSS</div>
+          <span class="tool-badge">Python</span>
         </div>
-        <p class="tool-desc">Automated malware analysis reporting engine that translates technical findings into professional, human-readable reports. Generates deterministic reports in Markdown, HTML, or PDF formats with specialized sections for evasion techniques and execution philosophies.</p>
+        <p class="tool-desc">Python-based proof-of-concept exploit for CVE-2024-39090, chaining a CSRF vulnerability with stored XSS in PHPGurukul Online Shopping Portal v2.0. Automates forged POST requests to inject persistent JavaScript payloads into user-controlled fields — executing in privileged user context upon page load, enabling session hijacking or credential theft scenarios during security assessments.</p>
         <div class="tool-tags">
-          <span class="tool-tag">Malware Analysis</span>
-          <span class="tool-tag">Reporting</span>
-          <span class="tool-tag">Automation</span>
-          <span class="tool-tag">CLI</span>
+          <span class="tool-tag">CSRF</span>
+          <span class="tool-tag">Stored XSS</span>
+          <span class="tool-tag">Web Security</span>
+          <span class="tool-tag">Exploit Development</span>
         </div>
-        <a class="tool-link" href="https://github.com/T3chfalcon/Malware-Report-Auto-Writer" target="_blank" rel="noopener">GitHub →</a>
+        <a class="tool-link" href="https://github.com/ghostwirez/CVE-2024-39090-PoC" target="_blank" rel="noopener">GitHub →</a>
+      </div>
+
+      <div class="tool-card" style="animation-delay:0.3s">
+        <div class="tool-header">
+          <div class="tool-name">Console Banking System</div>
+          <span class="tool-badge">C#</span>
+        </div>
+        <p class="tool-desc">C# console banking application implementing core account management operations against a flat-file binary store. Uses a custom polynomial hash function for O(1)-average account lookup with linear probing for collision resolution, supporting user registration, authentication, fund transfers, balance updates, and account deletion — all persisted via direct BinaryReader/BinaryWriter stream manipulation over a fixed-record-width file.</p>
+        <div class="tool-tags">
+          <span class="tool-tag">File I/O</span>
+          <span class="tool-tag">Console Application</span>
+          <span class="tool-tag">File Handling</span>
+          <span class="tool-tag">Data Structures</span>
+        </div>
+        <a class="tool-link" href="https://github.com/ghostwirez/CyberBank" target="_blank" rel="noopener">GitHub →</a>
       </div>
 
     </div>
@@ -1060,8 +1075,9 @@
       </div>
 
       <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--green-border);display:flex;gap:1.5rem;font-size:0.65rem">
-        <a href="https://github.com/t3chfalcon" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">GitHub →</a>
-        <a href="https://x.com/sec_alegaspi" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">Twitter/X →</a>
+        <a href="https://github.com/ghostwirez" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">GitHub →</a>
+        <a href="https://www.linkedin.com/in/arvinrafaellegaspi/" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">LinkedIn →</a>
+        <a href="https://discord.gg/np3eptqS4K" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">Discord Server →</a>
       </div>
     </div>
 
@@ -1081,7 +1097,7 @@
   </div>
   <div class="footer-links">
     <a href="#" onclick="showPage('about')">About</a>
-    <a href="https://github.com/t3chfalcon" target="_blank" rel="noopener">GitHub ↗</a>
+    <a href="https://github.com/ghostwirez" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
 </footer>
 
