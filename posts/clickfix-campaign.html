@@ -288,13 +288,13 @@ If you only take one thing away: the interesting part of this campaign isn’t t
 
 I came across it the way any visitor would, I’d navigated to a legitimate Philippine law firm’s website, and the page threw a fake “*I’m not a robot*” CAPTCHA at me.
 
-![](../images/posts/clickfix-blockchain/01.png)
+![](../images/posts/clickfix-campaign/01.png)
 
 Except this one didn’t want a checkbox click. It wanted me to press a key combination, paste, and hit Enter. If you know what you’re looking at, that’s **ClickFix:** instead of exploiting the browser, the attacker convinces *you* to run the command for them.
 
 One note before we go further is that the law firm is a victim here, not the villain. Their site was compromised and turned against their own visitors. **They’ve been notified**.
 
-![](../images/posts/clickfix-blockchain/02.jpeg)
+![](../images/posts/clickfix-campaign/02.jpg)
 
 I wanted to know where the CAPTCHA was coming from. So I did the boring, essential thing first: I looked at the page.
 
@@ -340,7 +340,7 @@ load_("0xE75744C53eC0914fE9bE92847019D3d7122B6b77").then(...)
 
 `eth_call`. `bnbchain`. `data-seed-prebsc`. This script isn't fetching its next stage from a server. It's reading a value out of a **smart contract on the BNB Smart Chain testnet** and `eval`-ing the result.
 
-![](../images/posts/clickfix-blockchain/03.png)
+![](../images/posts/clickfix-campaign/03.png)
 
 This is **EtherHiding**, and the lure logic isn’t hosted on a server at all — you can’t seize it, there’s no host to take down, there’s no abuse email to send. And they used *testnet*, where **gas is free** — so it costs them nothing to host it forever.
 
@@ -419,7 +419,7 @@ def rot(s, n):
 
 Peeling it gave up the whole stage:
 
-![](../images/posts/clickfix-blockchain/04.png)
+![](../images/posts/clickfix-campaign/04.png)
 
 (Note the first one is Base64 *inside* the rotation — rotate first, then decode.)
 
@@ -444,7 +444,7 @@ To a proxy or a reputation engine, the traffic is just a developer pulling from 
 
 I checked the account. It was **hours old**:
 
-![](../images/posts/clickfix-blockchain/05.png)
+![](../images/posts/clickfix-campaign/05.png)
 
 ```json
 { "created_at": "2026-08-24T08:31:47Z", "public_repos": 3 }
@@ -452,9 +452,9 @@ I checked the account. It was **hours old**:
 
 Three repos, not one. I pulled the other two text stagers, safe to read — and diffed them. Same template, three different targets:
 
-![](../images/posts/clickfix-blockchain/06.png)
+![](../images/posts/clickfix-campaign/06.png)
 
-![](../images/posts/clickfix-blockchain/07.png)
+![](../images/posts/clickfix-campaign/07.png)
 
 Three parallel delivery chains from one account. And the domains — `cardioslim`, `mindvault`, `heroup` — are supplement-brand-flavored, the signature of a bulk-registered affiliate pool being reused for malware.
 
@@ -547,7 +547,7 @@ Could not resolve host: yt8fj45sl9r6.eng-usa-mindvault.com
 
 **NXDOMAIN.** Both gone. The operational subdomains are provisioned per campaign wave and torn down within hours. But WHOIS told the other half of the story:
 
-![](../images/posts/clickfix-blockchain/08.png)
+![](../images/posts/clickfix-campaign/08.png)
 
 The apex domains are **8–11 months old**. The subdomains lived for hours.
 
@@ -566,18 +566,18 @@ The defensive consequence writes itself:
 
 This is the one point where “read the public data” wasn’t enough. The share was publicly mountable by anyone with the UNC path, but reaching it needed a real Windows WebDAV client, so I mounted it from a disposable VM, copied both files off.
 
-![](../images/posts/clickfix-blockchain/09.png)
+![](../images/posts/clickfix-campaign/09.png)
 
 To get the final PE I mounted the WebDAV share from a Windows box — the real mini-redirector request sequence finally got past the gate that had been 403-ing my `curl`.
 
-![](../images/posts/clickfix-blockchain/10.png)
+![](../images/posts/clickfix-campaign/10.jpg)
 
 The share held two files:
 
 1. `siKzwYcgZqHiAG.txt` (~24 MB)
 2. And a second one `ae.any` (~14.5 MB)
 
-![](../images/posts/clickfix-blockchain/11.png)
+![](../images/posts/clickfix-campaign/11.jpg)
 
 Both start with `MZ` once you account for encoding — the `.txt` begins with `TVqQ`, which is `MZ` in Base64, and `ae.any` is a raw PE.
 
@@ -590,11 +590,11 @@ The loader only fetches the `.txt`, so that's the one victims actually run. I co
 - **It carries a large overlay** — the classic loader-plus-packed-payload shape, with no plaintext C2 in the file.
 - **VirusTotal flags it 10/70**, labelled `trojan.hyis / injector / suspicious-NSIS`. Those are generic crypter and injector detections — they describe the *loader*, not the stealer it carries.
 
-![](../images/posts/clickfix-blockchain/12.jpeg)
+![](../images/posts/clickfix-campaign/12.jpg)
 
 And `ae.any`, the file sitting next to it on the share? The same trick in a different costume — another tampered, HashMismatch binary, this one masquerading as Valve's **"Steam Drivers Archive"** (`drivers.exe`, v10.72.90.89).
 
-![](../images/posts/clickfix-blockchain/13.png)
+![](../images/posts/clickfix-campaign/13.jpg)
 
 That one *was* unknown to VirusTotal — first-seen. So the operator staged two trojanized legitimate apps, different disguises, side by side. They're not wedded to one costume; they take any signed, trusted application, tamper it, and let its reputation carry the payload past a glance.
 
