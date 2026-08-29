@@ -533,7 +533,7 @@ Underneath, it does this:
 The `@SSL\DavWWWRoot` syntax forces the Windows **WebClient service** to mount the share over **TLS on port 443**. Three things fall out of that:
 
 - **No SMB on 445.** Egress filtering keyed on SMB sees nothing.
-- **The fetch is done by **`svchost.exe`, not PowerShell. Any detection tied to "PowerShell made a network connection" misses it completely.
+- **The fetch is done by `svchost.exe`**, not PowerShell. Any detection tied to "PowerShell made a network connection" misses it completely.
 - **The payload is a **`.txt`** on the wire.** Content inspection sees a text file.
 
 ## 9. Watching the infrastructure die
@@ -558,9 +558,9 @@ The defensive consequence writes itself:
 - **Domain-age heuristics**: Defeated — apexes are months old
 - **Reputation feeds**: Weak — apexes look like e-commerce
 - **FQDN blocklists**: Useless — subdomains expire in hours
-- **CT log monitoring: **Blind — Cloudflare wildcard cert, no per-subdomain record
-- **Apex-level blocking:** Works
-- **Behavioral detection: **Works
+- **CT log monitoring**: Blind — Cloudflare wildcard cert, no per-subdomain record
+- **Apex-level blocking**: Works
+- **Behavioral detection**: Works
 
 ## 10. The payload wears a borrowed costume
 
